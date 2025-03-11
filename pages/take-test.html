@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>📝 Прохождение теста</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            <span id="testTitle">Тест</span>
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/index.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/pages/profile.html"><i class="fas fa-user"></i> Профиль</a></li>
+                <li id="side-bar-btn"><a href="/pages/learning.html"><i class="fas fa-book"></i> Обучение</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <div id="testDescription" class="test-description"></div>
+            <div id="questionsList" class="questions-list">
+                <!-- Сюда будут загружаться вопросы теста -->
+            </div>
+            <button id="submitTest" class="submit-test">
+                <i class="fas fa-check"></i> Завершить тест
+            </button>
+        </div>
+    </div>
+    <script src="../scripts/menu.js"></script>
+    <script src="../scripts/take-test.js"></script>
+</body>
+</html>

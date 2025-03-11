@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>⚙️ Панель администратора</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            Панель администратора
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
+                <li id="side-bar-btn"><a href="/views/questions-management.html"><i class="fas fa-question-circle"></i> Управление контентом</a></li>
+                <li id="side-bar-btn"><a href="/views/theory-management.html"><i class="fas fa-book"></i> Управление теорией</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="line-main-page">
+                <div class="container-1">
+                    <h3>Статистика пользователей</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <i class="fas fa-users"></i>
+                            <span id="totalUsers">0</span>
+                            <p>Всего пользователей</p>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-user-check"></i>
+                            <span id="activeUsers">0</span>
+                            <p>Активных сегодня</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-1">
+                    <h3>Статистика тестов</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <i class="fas fa-question-circle"></i>
+                            <span id="totalQuestions">0</span>
+                            <p>Всего вопросов</p>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span id="completedTests">0</span>
+                            <p>Завершённых тестов</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-1">
+                    <h3>Системные настройки</h3>
+                    <div class="quick-actions">
+                        <button class="action-btn backup-btn"> <!-- Added backup-btn class -->
+                            <i class="fas fa-database"></i>
+                            Резервное копирование
+                        </button>
+                        <button class="action-btn settings-btn"> <!-- Added settings-btn class -->
+                            <i class="fas fa-cog"></i>
+                            Настройки системы
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="scripts/menu.js"></script>
+    <script src="scripts/admin.js"></script>
+</body>
+</html>

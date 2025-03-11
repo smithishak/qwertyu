@@ -1,0 +1,2299 @@
+.container-1 {
+    background: #e74c3c;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 10px; /* Added border-radius */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Added box-shadow */
+    min-height: 200px; /* Added min-height */
+}
+
+.container-1:hover {
+    background: #c0392b;
+}
+
+.admin-controls {
+    margin-top: 20px;
+}
+
+#logoutBtn {
+    color: #e74c3c;
+}
+
+.add-user-form {
+    display: grid;
+    gap: 20px;  /* Увеличили отступ между элементами */
+    max-width: 500px;
+    margin-bottom: 30px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;  /* Добавили внутренний отступ */
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;  /* Добавили отступ снизу */
+    width: 100%;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"] {
+	width: 100%; /* Устанавливаем ширину 100% */
+	padding: 12px;
+	border: 2px солид #e0e0e0;
+	border-radius: 8px;
+	font-family: inherit;
+	transition: border-color 0.3s ease;
+	margin: 0; /* Сбрасываем margin */
+	box-sizing: border-box; /* Учитываем padding и border в ширине */
+}
+
+.form-group input[type="email"]:focus {
+	border-color: #2ecc71;
+	outline: none;
+}
+
+.form-group.answer-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px солид #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group.answer-group input[type="text"] {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+}
+
+.form-group.answer-group .radio-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    padding: 0 10px;
+}
+
+.form-group.answer-group input[type="radio"] {
+    margin: 0;
+}
+
+.form-group.answer-group .radio-label {
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.users-table th,
+.users-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.users-table th {
+    background-color: #f5f5f5;
+}
+
+.edit-btn,
+.delete-btn,
+.copy-btn,
+.reset-btn {
+	padding: 10px; /* Устанавливаем одинаковые размеры */
+	margin: 0 5px; /* Добавляем отступы между кнопками */
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	display: inline-flex; /* Устанавливаем одинаковое поведение */
+	align-items: center;
+	justify-content: center;
+	font-size: 14px; /* Устанавливаем одинаковый размер шрифта */
+	width: 40px; /* Устанавливаем одинаковую ширину */
+	height: 40px; /* Устанавливаем одинаковую высоту */
+}
+
+.edit-btn {
+	background-color: #2ecc71;
+	color: white;
+}
+
+.delete-btn {
+	background-color: #e74c3c;
+	color: white;
+}
+
+.copy-btn {
+	background-color: #27ae60;
+	color: white;
+}
+
+.reset-btn {
+	background-color: #c0392b;
+	color: white;
+}
+
+.edit-btn:hover,
+.delete-btn:hover,
+.copy-btn:hover,
+.reset-btn:hover {
+	opacity: 0.8;
+}
+
+.users-table td .action-buttons {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px; /* Добавляем отступы между кнопками */
+}
+
+.users-container {
+    display: flex;
+    gap: 2rem;
+    margin: 1rem;
+}
+
+.add-user-block {
+    flex: 0 0 300px;
+    background: white;
+    border-radius: 15px;
+    padding: 30px;  /* Увеличили отступ */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.users-list-block {
+    flex: 1;
+}
+
+.users-table {
+    width: 100%;
+}
+
+.questions-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 
+        "create-test create-question"
+        "test-list question-list";
+    gap: 2rem;
+    padding: 20px;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.add-question-block {
+    grid-area: create-question;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-question-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px солид #3498db;
+}
+
+.add-question-form .form-group {
+    margin-bottom: 20px;
+}
+
+.add-question-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.add-question-form textarea {
+    min-height: 100px;
+    padding: 12px;
+    border: 2px солид #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.answer-group {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border: 1px солид #e0e0e0;
+}
+
+.answer-group input[type="text"] {
+    width: calc(100% - 120px);
+    padding: 10px;
+    border: 2px солид #e0e0e0;
+    border-radius: 6px;
+}
+
+.radio-label {
+    display: inline-block !important;
+    margin-left: 10px !important;
+}
+
+#addAnswerBtn {
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+#addAnswerBtn:hover {
+    background-color: #27ae60;
+}
+
+.add-question-form button[type="submit"] {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.add-question-form button[type="submit"]:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+.questions-list-block {
+    grid-area: question-list;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.questions-list-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px солид #3498db;
+}
+
+.add-question-form textarea {
+    min-height: 100px;
+    padding: 8px;
+    border: 1px солид #ddd;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.answer-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.radio-label {
+    margin-left: 5px;
+}
+
+#addAnswerBtn {
+    margin-bottom: 15px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#addAnswerBtn:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.questions-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed; /* Добавляем фиксированную компоновку */
+}
+
+.questions-table th {
+    background-color: #f8f9fa;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px солид #e0e0e0;
+}
+
+.questions-table td {
+    border-bottom: 1px солид #e0e0e0;
+    word-wrap: break-word; /* Добавляем перенос слов */
+    overflow: hidden; /* Скрываем переполнение */
+}
+
+.questions-table th:nth-child(1) {
+    width: 50%;
+}
+
+.questions-table th:nth-child(2) {
+    width: 30%;
+}
+
+.questions-table th:nth-child(3) {
+    width: 20%;
+}
+
+/* Добавляем медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .users-container, .questions-container {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 0.5rem;
+    }
+
+    .add-user-block, .add-question-block {
+        flex: 1;
+        width: 100%;
+    }
+
+    .users-list-block, .questions-list-block {
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    .users-table, .questions-table {
+        min-width: 600px; /* Минимальная ширина таблицы для прокрутки */
+    }
+
+    .form-group {
+        margin-bottom: 10px;
+    }
+
+    .add-user-form, .add-question-form {
+        margin-bottom: 20px;
+    }
+
+    /* Улучшаем отображение кнопок на мобильных устройствах */
+    .edit-btn, .delete-btn, .copy-btn, .reset-btn {
+        padding: 10px 14px;
+        margin: 2px;
+    }
+
+    /* Улучшаем отображение полей ввода на мобильных устройствах */
+    .form-group input[type="text"],
+    .form-group textarea {
+        padding: 10px;
+        font-size: 16px; /* Оптимальный размер для мобильных */
+    }
+
+    .answer-group {
+        flex-wrap: wrap;
+    }
+
+    /* Улучшаем отображение заголовков на мобильных устройствах */
+    h2 {
+        font-size: 1.5rem;
+        margin: 15px 0;
+    }
+
+    .question-row {
+        display: block;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .question-header {
+        padding: 15px;
+        cursor: pointer;
+        display: block;
+    }
+
+    .question-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .question-number {
+        font-weight: bold;
+        min-width: 25px;
+    }
+
+    .question-preview {
+        flex: 1;
+    }
+
+    .fa-chevron-down {
+        transition: transform 0.3s;
+    }
+
+    .question-details {
+        display: none;
+        padding: 15px;
+        border-top: 1px solid #eee;
+        background: white;
+    }
+
+    .question-details.show {
+        display: block;
+    }
+
+    .question-row.expanded .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .question-row.expanded .question-details {
+        display: block;
+    }
+
+    .full-question {
+        margin-bottom: 10px;
+        font-weight: bold;
+    }
+
+    .answers-list {
+        margin: 10px 0;
+        padding-left: 15px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+    }
+
+    /* Скрываем стандартные заголовки таблицы на мобильных */
+    .questions-table thead {
+        display: none;
+    }
+
+    .questions-table tbody {
+        display: block;
+    }
+
+    .questions-table, 
+    .questions-table tbody,
+    .questions-table tr {
+        display: block;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .questions-table {
+        border: none;
+        min-width: auto;
+    }
+
+    /* Стили для выпадающего списка пользователей */
+    .user-row {
+        display: block;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .user-header {
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1; /* Добавляем, чтобы занять доступное пространство */
+    }
+
+    .fa-chevron-down {
+        margin-left: auto; /* Добавляем отступ слева, чтобы прижать стрелку вправо */
+        font-size: 16px;
+        color: #666;
+        transition: transform 0.3s;
+    }
+
+    .user-number {
+        font-weight: bold;
+        min-width: 25px;
+    }
+
+    .user-preview {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .user-details {
+        display: none;
+        padding: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .user-row.expanded .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .user-row.expanded .user-details {
+        display: block;
+    }
+
+    .full-name {
+        margin-bottom: 10px;
+    }
+
+    .user-role {
+        margin-bottom: 15px;
+        color: #666;
+    }
+
+    /* Скрываем стандартные заголовки таблицы на мобильных */
+    .users-table thead {
+        display: none;
+    }
+
+    .users-table, 
+    .users-table tbody,
+    .users-table tr,
+    .users-table td {
+        display: block;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+
+    .users-table {
+        border: none;
+        min-width: auto;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 15px;
+    }
+
+    .action-buttons button {
+        flex: 1;
+        min-width: calc(50% - 4px);
+        margin: 0;
+    }
+}
+
+/* Обновляем стили для форм и их контейнеров */
+.content {
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+}
+
+.users-section, .questions-section {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.add-user-form, .add-question-form {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Обновляем медиа-запрос */
+@media screen and (max-width: 768px) {
+    .users-container, .questions-container {
+        flex-direction: column;
+        gap: 1rem;
+        margin: 0;
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .add-user-block, .add-question-block {
+        width: 100%;
+        padding: 20px;  /* Уменьшаем padding на мобильных */
+        box-sizing: border-box;
+    }
+
+    .users-list-block, .questions-list-block {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Плавная прокрутка на iOS */
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .form-group {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-group input[type="text"],
+    .form-group textarea {
+        width: 100%;
+        box-sizing: border-box;
+        max-width: 100%;
+    }
+
+    .answer-group {
+        flex-wrap: wrap;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .answer-group input[type="text"] {
+        width: calc(100% - 20px);
+        margin: 5px 10px;
+    }
+
+    /* Улучшаем отображение таблиц */
+    .users-table, .questions-table {
+        min-width: 100%;
+        max-width: none;
+        display: block;
+    }
+
+    /* Добавляем горизонтальную прокрутку для таблиц */
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 15px;
+    }
+}
+
+/* Стили для кнопок создания */
+button[type="submit"] {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+button[type="submit"]:active {
+    transform: translateY(1px);
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    button[type="submit"] {
+        padding: 12px 20px;
+        font-size: 16px;
+        margin-top: 20px;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .questions-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.add-user-block {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;  /* Увеличили отступ */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.add-user-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px солид #3498db;
+}
+
+.add-user-form .form-group {
+    margin-bottom: 20px;
+}
+
+.add-user-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.add-user-form input[type="text"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px солид #e0e0e0;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.add-user-form input[type="text"]:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+.admin-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 15px;
+	background: #f8f9fa;
+	border-radius: 8px;
+	margin: 10px 0; /* Добавили отступы сверху и снизу */
+	box-sizing: border-box; /* Учитываем padding и border в ширине */
+	width: 100%; /* Устанавливаем ширину 100% */
+}
+
+.admin-checkbox input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+}
+
+.admin-checkbox label {
+	margin: 0 !important;
+	cursor: pointer;
+}
+
+.users-list-block {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.users-list-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px солид #3498db;
+}
+
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+}
+
+.users-table th {
+    background-color: #f8f9fa;
+    padding: 15px;
+    text-align: left;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.users-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.users-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.action-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s ease;
+}
+
+.edit-button {
+    background-color: #3498db;
+    color: white;
+}
+
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+@media screen and (max-width: 768px) {
+    .users-container {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+
+    .add-user-block,
+    .users-list-block {
+        margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-button {
+        width: 100%;
+    }
+}
+
+.add-test-block {
+    grid-area: create-test;
+    position: sticky;
+    top: 20px;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    align-self: start;
+    height: fit-content;
+    box-sizing: border-box;
+}
+
+.add-test-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px солид #3498db;
+}
+
+.add-test-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.add-test-form .form-group {
+    margin-bottom: 20px;
+}
+
+.add-test-form input[type="text"],
+.add-test-form textarea {
+    padding: 12px;
+    border: 2px солид #e0e0e0;
+    border-radius: 8px;
+    font-family: inherit;
+    transition: border-color 0.3s ease;
+}
+
+.add-test-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.tests-list-block {
+    grid-area: test-list;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+}
+
+.tests-list-block h2 {
+    color: #2c3e50;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3498db;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.test-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.test-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.test-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.test-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.test-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.test-description {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.test-info {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #888;
+}
+
+.test-info span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.test-info i {
+    color: #3498db;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .test-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .test-actions {
+        width: 100%;
+    }
+
+    .test-actions button {
+        flex: 1;
+    }
+
+    .test-info {
+        flex-wrap: wrap;
+    }
+}
+
+.tests-list-block {
+    grid-area: test-list;
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+}
+
+.tests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .questions-container {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "create-test"
+            "create-question"
+            "test-list"
+            "question-list";
+        gap: 1rem;
+        padding: 10px;
+    }
+
+    .add-test-block,
+    .add-question-block,
+    .tests-list-block,
+    .questions-list-block {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
+/* Стили для выпадающих меню */
+select {
+    width: 100%;
+    padding: 12px;
+    border: 2px солид #e0e0e0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: white;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%232c3e50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+select:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Обновляем стили для поисковых фильтров */
+.search-filters {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-filters input[type="text"],
+.search-filters select {
+    height: 42px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 0 15px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.search-filters input[type="text"] {
+    flex: 2; /* Поле поиска занимает 2/3 пространства */
+    min-width: 200px;
+}
+
+.search-filters select {
+    flex: 1; /* Селект занимает 1/3 пространства */
+    min-width: 150px;
+    background-position: right 10px center;
+}
+
+/* Перепишем стили для поисковых фильтров с более высоким приоритетом */
+.questions-list-block .search-filters {
+    display: flex;
+    align-items: stretch;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.questions-list-block .search-filters input[type="text"] {
+    flex: 2;
+    height: 48px;
+    min-width: 200px;
+    padding: 0 15px;
+    font-size: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+}
+
+.questions-list-block .search-filters select {
+    flex: 1;
+    height: 48px;
+    min-width: 150px;
+    padding: 0 35px 0 15px;
+    font-size: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%232c3e50' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .questions-list-block .search-filters {
+        flex-direction: column;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .questions-list-block .search-filters input[type="text"],
+    .questions-list-block .search-filters select {
+        width: 100%;
+        height: 52px;
+        font-size: 16px;
+    }
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .search-filters {
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .search-filters input[type="text"],
+    .search-filters select {
+        width: 100%;
+        margin: 0;
+    }
+}
+
+/* Стили для списков элементов */
+.tests-list,
+.questions-table {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Стили для элементов списка */
+.test-item,
+.question-row {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px солид #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.test-item:hover,
+.question-row:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Заголовки элементов */
+.test-item-header,
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #2ecc71;
+}
+
+/* Информация об элементах */
+.test-info,
+.question-info {
+    display: flex;
+    gap: 15px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Кнопки действий */
+.test-actions,
+.question-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Стили для кнопок */
+.action-btn, 
+.edit-btn, 
+.delete-btn,
+.backup-btn,
+.settings-btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    color: white;
+    background-color: #3498db;
+}
+
+.edit-btn {
+    background-color: #3498db;
+}
+
+.delete-btn {
+    background-color: #e74c3c;
+}
+
+.backup-btn {
+    background-color: #2ecc71;
+}
+
+.settings-btn {
+    background-color: #f39c12;
+}
+
+.action-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover,
+.backup-btn:hover,
+.settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Стили для кнопок в test-list-block */
+.test-actions button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.test-actions .edit-test-btn {
+    background-color: #3498db;
+}
+
+.test-actions .delete-test-btn {
+    background-color: #e74c3c;
+}
+
+.test-actions .view-test-btn {
+    background-color: #2ecc71;
+}
+
+.test-actions button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.test-actions button i {
+    font-size: 14px;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .test-actions {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+    }
+
+    .test-actions button {
+        flex: 1;
+        justify-content: center;
+        padding: 12px 15px;
+        white-space: nowrap;
+    }
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .search-filters {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .test-item-header,
+    .question-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .test-actions,
+    .question-actions {
+        width: 100%;
+    }
+
+    .test-actions button,
+    .question-actions button {
+        flex: 1;
+    }
+
+    .test-info,
+    .question-info {
+        flex-wrap: wrap;
+    }
+
+    .search-filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .search-filters select {
+        width: 100%;
+    }
+    
+    .action-btn, 
+    .edit-btn, 
+    .delete-btn,
+    .backup-btn,
+    .settings-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 15px;
+    }
+}
+
+.stats {
+    display: flex;
+    gap: 20px; /* Added gap between stat items */
+    margin-top: 15px; /* Added margin-top */
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #ff9898; /* Added background color */
+    padding: 15px; /* Added padding */
+    border-radius: 8px; /* Added border-radius */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added box-shadow */
+    min-width: 150px; /* Added min-width */
+    min-height: 150px; /* Added min-height */
+    color: white;
+}
+
+.stat-item i {
+    font-size: 2rem; /* Increased icon size */
+    margin-bottom: 10px; /* Added margin-bottom */
+}
+
+.stat-item span {
+    font-size: 1.5rem; /* Increased font size */
+    font-weight: bold; /* Added font-weight */
+}
+
+.stat-item p {
+    margin: 0;
+    font-size: 1rem; /* Adjusted font size */
+    color: #ecf0f1; /* Changed text color */
+}
+
+@media screen and (max-width: 768px) {
+    .users-table {
+        display: none; /* Скрываем таблицу на мобильных устройствах */
+    }
+
+    .users-list-mobile {
+        display: block;
+    }
+
+    .user-row {
+        display: block;
+        margin-bottom: 10px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .user-header {
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .user-summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .user-number {
+        font-weight: bold;
+        min-width: 25px;
+    }
+
+    .user-preview {
+        flex: 1;
+        font-weight: 500;
+    }
+
+    .user-details {
+        display: none;
+        padding: 15px;
+        border-top: 1px solid #eee;
+    }
+
+    .user-row.expanded .user-details {
+        display: block;
+    }
+
+    .full-name {
+        margin-bottom: 10px;
+    }
+
+    .user-role {
+        margin-bottom: 15px;
+        color: #666;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+}
+
+@media screen and (min-width: 769px) {
+	.users-list-mobile {
+		display: none; /* Скрываем выпадающий список на компьютерной версии */
+	}
+}
+
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 4px;
+    transition: all 0.2s ease;
+}
+
+.icon-btn i {
+    font-size: 14px;
+}
+
+.icon-btn.edit-btn {
+    background-color: #3498db;
+    color: white;
+}
+
+.icon-btn.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Обновляем стили для контейнера кнопок */
+.questions-table td.action-buttons {
+    white-space: nowrap;
+    width: 80px;
+    text-align: center;
+}
+
+/* Обновленные стили для мобильной версии */
+@media screen and (max-width: 768px) {
+    .question-row {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+        overflow: hidden;
+    }
+
+    .question-header {
+        padding: 15px;
+        background-color: #f8f9fa;
+        cursor: pointer; /* Добавляем курсор-указатель */
+    }
+
+    .question-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .question-number {
+        background: #3498db;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .question-preview {
+        flex: 1;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .question-details {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        background: white;
+        display: none;
+    }
+
+    .question-details.show {
+        display: block;
+    }
+
+    .answers-list {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f8f9fa;
+        border-radius: 6px;
+    }
+
+    .answers-list br {
+        display: none;
+    }
+
+    .answers-list span {
+        display: block;
+        padding: 8px;
+        margin: 5px 0;
+        background: white;
+        border-radius: 4px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        margin-top: 15px;
+        padding: 0 15px 15px;
+    }
+
+    .icon-btn {
+        flex: 1;
+        height: 40px;
+    }
+
+    .icon-btn i {
+        margin-right: 8px;
+    }
+
+    /* Добавляем текст к иконкам на мобильных */
+    .icon-btn.edit-btn:after {
+        content: "Редактировать";
+        margin-left: 5px;
+    }
+
+    .icon-btn.delete-btn:after {
+        content: "Удалить";
+        margin-left: 5px;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column; /* Меняем на вертикальное расположение */
+        gap: 10px;
+        margin-top: 15px;
+        padding: 0 15px 15px;
+        width: 100%; /* Занимаем всю ширину */
+    }
+
+    .icon-btn {
+        width: 100%; /* Кнопка на всю ширину */
+        height: 44px; /* Увеличиваем высоту для удобства */
+        padding: 0 15px; /* Добавляем отступы по бокам */
+        justify-content: center; /* Центрируем содержимое */
+    }
+
+    .icon-btn i {
+        margin-right: 10px;
+        font-size: 16px; /* Немного увеличиваем иконку */
+    }
+
+    /* Стили для текста кнопок */
+    .icon-btn:after {
+        flex: 1; /* Позволяет тексту занимать доступное пространство */
+        text-align: center; /* Центрируем текст */
+        font-size: 14px; /* Размер текста */
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px 0; /* Изменили отступы */
+        padding: 0; /* Убрали паддинги */
+        width: 100%;
+    }
+
+    .icon-btn {
+        width: 100%;
+        min-height: 48px; /* Увеличили минимальную высоту */
+        padding: 10px 16px; /* Увеличили внутренние отступы */
+        justify-content: flex-start; /* Выравнивание по левому краю */
+        border-radius: 6px; /* Скругление углов */
+    }
+
+    .icon-btn i {
+        width: 20px; /* Фиксированная ширина для иконки */
+        font-size: 16px;
+        margin-right: 12px;
+    }
+
+    /* Стили для текста кнопок */
+    .icon-btn:after {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    /* Убираем transform при наведении на мобильных */
+    .icon-btn:hover {
+        transform: none;
+    }
+
+    /* Исправляем отступы в контейнере вопроса */
+    .question-details {
+        padding: 15px;
+    }
+
+    /* Добавляем отступы для списка ответов */
+    .answers-list {
+        margin: 15px 0;
+        padding: 15px;
+    }
+
+    /* Исправляем отступы для вариантов ответов */
+    .answers-list span {
+        padding: 12px;
+        margin: 8px 0;
+    }
+}
+
+/* Обновляем стили для полей ввода и выпадающих списков */
+.search-filters input[type="text"],
+.search-filters select,
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group select {
+    height: 48px; /* Увеличиваем высоту */
+    padding: 0 15px;
+    font-size: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-sizing: border-box;
+    background-color: white;
+}
+
+/* Обновляем стили для выпадающих списков */
+select {
+    height: 48px; /* Увеличиваем высоту */
+    padding: 0 35px 0 15px; /* Увеличиваем отступ справа для иконки */
+    background-position: right 15px center;
+    background-size: 16px;
+}
+
+/* Обновляем стили для поисковых фильтров */
+.search-filters {
+    padding: 20px; /* Увеличиваем внутренние отступы */
+    gap: 20px; /* Увеличиваем отступ между элементами */
+}
+
+@media screen and (max-width: 768px) {
+    .search-filters input[type="text"],
+    .search-filters select,
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group select {
+        height: 52px; /* Еще больше увеличиваем высоту на мобильных */
+        font-size: 16px; /* Оптимальный размер шрифта для мобильных */
+    }
+
+    .search-filters {
+        padding: 15px;
+        gap: 15px;
+    }
+}
+
+/* Стили для модального окна */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modal h3 {
+    margin-bottom: 20px;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
+}
+
+.edit-user-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Обновляем стили для кнопок в модальном окне */
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.save-btn, 
+.cancel-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    width: 50%;
+}
+
+.save-btn {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.save-btn:hover,
+.cancel-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .modal-buttons {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .save-btn, 
+    .cancel-btn {
+        width: 100%;
+        padding: 14px 20px;
+    }
+}
+
+/* Обновляем стили для мобильной версии кнопок */
+@media screen and (max-width: 768px) {
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px;
+        width: calc(100% - 30px); /* Учитываем отступы по краям */
+    }
+
+    .icon-btn {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 15px;
+        justify-content: center;
+        border-radius: 6px;
+        margin: 0;
+    }
+
+    .icon-btn i {
+        margin-right: 8px;
+        width: 16px;
+        text-align: center;
+    }
+
+    .icon-btn:after {
+        content: attr(data-title);
+        display: inline-block;
+        flex: 1;
+        text-align: center;
+    }
+
+    .icon-btn.edit-btn:after {
+        content: "Редактировать";
+    }
+
+    .icon-btn.delete-btn:after {
+        content: "Удалить";
+    }
+}
+
+/* Стили для текстового редактора */
+.editor-toolbar {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+.editor-toolbar button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: white;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.editor-toolbar button:hover {
+    background: #e9ecef;
+}
+
+.editor-toolbar button.active {
+    background: #e9ecef;
+    color: #3498db;
+}
+
+.text-editor {
+    min-height: 300px;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 0 8px 8px;
+    background: white;
+    overflow-y: auto;
+}
+
+.text-editor:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+@media screen and (max-width: 768px) {
+    .editor-toolbar {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .text-editor {
+        min-height: 200px;
+    }
+
+    .editor-toolbar button {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Обновляем стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    /* Стили для раскрывающегося вопроса */
+    .question-row {
+        margin-bottom: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+    }
+
+    .question-header {
+        padding: 15px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .question-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .question-preview {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #333;
+    }
+
+    .question-details {
+        padding: 15px;
+        border-top: 1px solid #eee;
+        background: white;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .question-details.show {
+        display: block;
+        max-height: none;
+        opacity: 1;
+    }
+
+    .full-question {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 15px;
+        color: #2c3e50;
+    }
+
+    .answers-list {
+        margin: 15px 0;
+    }
+
+    .answers-list span {
+        display: block;
+        padding: 12px 15px;
+        margin: 8px 0;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .questions-table td {
+        padding: 0;
+        border: none;
+    }
+
+    .questions-table tr {
+        display: block;
+        margin-bottom: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    /* Обновляем стили для мобильной версии вопросов */
+    .question-row {
+        margin-bottom: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .question-header {
+        width: 100%;
+        padding: 15px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+        min-height: 60px;
+        box-sizing: border-box;
+    }
+
+    .question-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding-right: 30px; /* Место для стрелки */
+    }
+
+    .question-number {
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        background: #3498db;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .question-preview {
+        flex: 1;
+        font-size: 14px;
+        line-height: 1.4;
+        color: #333;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .question-details {
+        display: none;
+        padding: 15px;
+        background: white;
+        border-radius: 0 0 8px 8px;
+    }
+
+    .question-details.show {
+        display: block;
+    }
+
+    /* Обновляем стили для списка ответов */
+    .answers-list {
+        margin: 15px 0;
+    }
+
+    .answers-list span {
+        display: block;
+        padding: 12px 15px;
+        margin: 8px 0;
+        background: #f8f9fa;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+}
+
+.questions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px 0;
+}
+
+.question-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.question-content {
+    margin-bottom: 15px;
+}
+
+.question-text {
+    font-size: 16px;
+    color: #2c3e50;
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+.answers-grid {
+    display: grid;
+    gap: 8px;
+    margin: 15px 0;
+}
+
+.answer-item {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.answer-item.correct {
+    border-color: #2ecc71;
+    background: #eafaf1;
+}
+
+.answer-item.correct::before {
+    content: '✓';
+    color: #2ecc71;
+}
+
+.question-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.question-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+@media screen and (max-width: 768px) {
+    .questions-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+
+    .question-card {
+        margin-bottom: 15px;
+    }
+
+    .question-actions {
+        flex-direction: column;
+    }
+
+    .question-actions button {
+        width: 100%;
+    }
+}
+
+/* Стили для модального окна редактирования вопроса */
+.edit-question-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.edit-question-form textarea {
+    min-height: 100px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+}
+
+.edit-question-form .answer-group {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#editAddAnswerBtn {
+    background-color: #2ecc71;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+#editAddAnswerBtn:hover {
+    background-color: #27ae60;
+}
+
+.modal .remove-answer-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+/* Адаптивные стили */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        margin: 10px auto;
+        padding: 15px;
+    }
+
+    .edit-question-form .answer-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .edit-question-form .answer-group input[type="text"] {
+        width: 100%;
+    }
+}

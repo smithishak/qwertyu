@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>📚 Система тестирования</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            Система тестирования
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/index.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/pages/learning.html"><i class="fas fa-book"></i> Обучение</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2><i class="fas fa-tasks"></i> Доступные тесты</h2>
+            <div class="tests-grid" id="testsList">
+                <!-- Сюда будут загружаться доступные тесты -->
+            </div>
+        </div>
+    </div>
+<script src="scripts/menu.js"></script>
+<script src="scripts/test.js"></script>
+</body>
+</html>

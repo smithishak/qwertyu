@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>👥 Управление пользователями</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            Пользователи
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
+                <li id="side-bar-btn"><a href="/views/questions-management.html"><i class="fas fa-question-circle"></i> Управление контентом</a></li>
+                <li id="side-bar-btn"><a href="/views/theory-management.html"><i class="fas fa-book"></i> Управление теорией</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="users-section">
+                <div class="users-container">
+                    <div class="add-user-block">
+                        <h2><i class="fas fa-user-plus"></i> Добавить пользователя</h2>
+                        <form id="addUserForm" class="add-user-form">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Логин:</label>
+                                <input type="text" name="username" placeholder="Введите логин" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tag"></i> Фамилия:</label>
+                                <input type="text" name="lastName" placeholder="Введите фамилию" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tag"></i> Имя:</label>
+                                <input type="text" name="firstName" placeholder="Введите имя" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-user-tag"></i> Отчество:</label>
+                                <input type="text" name="middleName" placeholder="Введите отчество">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-phone"></i> Номер телефона:</label>
+                                <input type="text" name="phoneNumber" placeholder="Введите номер телефона" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> Адрес электронной почты:</label>
+                                <input type="email" name="email" placeholder="Введите адрес электронной почты" required>
+                            </div>
+                            <div class="form-group admin-checkbox">
+                                <input type="checkbox" name="isAdmin" id="isAdmin">
+                                <label for="isAdmin"><i class="fas fa-user-shield"></i> Администратор</label>
+                            </div>
+                            <button type="submit">
+                                <i class="fas fa-user-plus"></i> Создать пользователя
+                            </button>
+                        </form>
+                    </div>
+                    <div class="users-list-block">
+                        <h2><i class="fas fa-users"></i> Список пользователей</h2>
+                        <div class="table-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Логин</th>
+                                        <th>ФИО</th>
+                                        <th>Роль</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersList">
+                                    <!-- Сюда будут добавляться пользователи -->
+                                    <tr>
+                                        <td>username</td>
+                                        <td>ФИО</td>
+                                        <td>Роль</td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="edit-btn"><i class="fas fa-edit"></i></button>
+                                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
+                                                <button class="copy-btn"><i class="fas fa-copy"></i></button>
+                                                <button class="reset-btn"><i class="fas fa-key"></i></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="usersListMobile" class="users-list-mobile">
+                            <!-- Сюда будут добавляться пользователи для мобильной версии -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать пользователя</h3>
+            <form id="editUserForm" class="edit-user-form">
+                <input type="hidden" name="userId">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Логин:</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Фамилия:</label>
+                    <input type="text" name="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Имя:</label>
+                    <input type="text" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user-tag"></i> Отчество:</label>
+                    <input type="text" name="middleName">
+                </div>
+                <div class="form-group admin-checkbox">
+                    <input type="checkbox" name="isAdmin" id="editIsAdmin">
+                    <label for="editIsAdmin"><i class="fas fa-user-shield"></i> Администратор</label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Сохранить</button>
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../scripts/menu.js"></script>
+    <script src="../scripts/admin-users.js"></script>
+</body>
+</html>

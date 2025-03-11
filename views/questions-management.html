@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>❓ Управление тестами</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            Управление тестами
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
+                <li id="side-bar-btn"><a href="/views/questions-management.html"><i class="fas fa-question-circle"></i> Управление контентом</a></li>
+                <li id="side-bar-btn"><a href="/views/theory-management.html"><i class="fas fa-book"></i> Управление теорией</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <div class="questions-section">
+                <div class="questions-container">
+                    <!-- Блок создания теста -->
+                    <div class="add-test-block">
+                        <h2><i class="fas fa-plus-circle"></i> Создать тест</h2>
+                        <form id="addTestForm" class="add-test-form">
+                            <div class="form-group">
+                                <label><i class="fas fa-heading"></i> Название теста:</label>
+                                <input type="text" name="testTitle" placeholder="Введите название теста" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-info-circle"></i> Описание теста:</label>
+                                <textarea name="testDescription" placeholder="Введите описание теста"></textarea>
+                            </div>
+                            <button type="submit">
+                                <i class="fas fa-save"></i> Создать тест
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Существующий блок с вопросами -->
+                    <div class="add-question-block">
+                        <h2><i class="fas fa-plus-circle"></i> Добавить вопрос</h2>
+                        <form id="addQuestionForm" class="add-question-form">
+                            <div class="form-group">
+                                <label><i class="fas fa-list"></i> Выберите тест:</label>
+                                <select name="testId" required>
+                                    <option value="">Выберите тест</option>
+                                    <!-- Опции будут добавлены динамически -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-question"></i> Текст вопроса:</label>
+                                <textarea id="questionText" name="questionText" placeholder="Введите текст вопроса" required></textarea>
+                            </div>
+                            <div id="answersContainer">
+                                <div class="form-group answer-group">
+                                    <input type="text" name="answer1" placeholder="Введите вариант ответа" required>
+                                    <div class="radio-container">
+                                        <input type="radio" name="correctAnswer" value="0" required>
+                                        <span class="radio-label">Правильный ответ</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" id="addAnswerBtn">
+                                <i class="fas fa-plus"></i> Добавить вариант ответа
+                            </button>
+                            <button type="submit">
+                                <i class="fas fa-save"></i> Создать вопрос
+                            </button>
+                        </form>
+                    </div>
+                    <div class="questions-list-block">
+                        <h2>Список вопросов</h2>
+                        <div class="search-filters">
+                            <input type="text" id="questionSearch" placeholder="Поиск вопросов...">
+                            <select id="questionFilter">
+                                <option value="all">Все вопросы</option>
+                                <option value="active">Активные</option>
+                                <option value="inactive">Неактивные</option>
+                            </select>
+                        </div>
+                        <div id="questionsList" class="questions-grid">
+                            <!-- Вопросы будут добавляться сюда -->
+                        </div>
+                    </div>
+
+                    <!-- Блок со списком тестов -->
+                    <div class="tests-list-block">
+                        <h2><i class="fas fa-list"></i> Список тестов</h2>
+                        <div class="search-filters">
+                            <input type="text" id="testSearch" placeholder="Поиск тестов...">
+                            <select id="testFilter">
+                                <option value="all">Все тесты</option>
+                                <option value="active">Активные</option>
+                                <option value="inactive">Неактивные</option>
+                            </select>
+                        </div>
+                        <div id="testsList" class="tests-list">
+                            <!-- Сюда будут добавляться тесты -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Модальное окно для редактирования вопроса -->
+    <div id="editQuestionModal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать вопрос</h3>
+            <form id="editQuestionForm" class="edit-question-form">
+                <input type="hidden" name="questionId">
+                <div class="form-group">
+                    <label><i class="fas fa-list"></i> Тест:</label>
+                    <select name="testId" required>
+                        <!-- Опции будут добавлены динамически -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-question"></i> Текст вопроса:</label>
+                    <textarea name="questionText" required></textarea>
+                </div>
+                <div id="editAnswersContainer">
+                    <!-- Ответы будут добавлены динамически -->
+                </div>
+                <button type="button" id="editAddAnswerBtn">
+                    <i class="fas fa-plus"></i> Добавить вариант ответа
+                </button>
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Сохранить</button>
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="../scripts/menu.js"></script>
+    <script src="../scripts/admin-tests.js"></script>
+    <script src="../scripts/admin-questions.js"></script>
+</body>
+</html>

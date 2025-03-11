@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>🔐 Вход в систему</title>    
+    <script src="../scripts/login.js"></script>
+</head>
+<body>
+    <!-- Контейнер формы входа -->
+    <div class="login-container">
+        <h2>Вход в систему</h2>
+        <form id="loginForm">
+            <!-- Поля ввода -->
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Логин" required>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" placeholder="Пароль" required>
+            </div>
+            <button type="submit">
+                <i class="fas fa-sign-in-alt"></i> Войти
+            </button>
+        </form>
+    </div>
+</body>
+</html>

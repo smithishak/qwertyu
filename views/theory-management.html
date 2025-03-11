@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>📚 Управление теорией</title>
+</head>
+<body>
+    <header>
+        <div class="menu-btn">
+            <i class="fas fa-bars"></i>
+        </div>
+        <div class="logo">
+            Управление теорией
+        </div>
+    </header>
+
+    <div class="main-content">
+        <div class="sidebar">
+            <ul>
+                <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
+                <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
+                <li id="side-bar-btn"><a href="/views/questions-management.html"><i class="fas fa-question-circle"></i> Управление контентом</a></li>
+                <li id="side-bar-btn"><a href="/views/theory-management.html"><i class="fas fa-book"></i> Управление теорией</a></li>
+                <li id="side-bar-btn"><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Выход</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <div class="theory-section">
+                
+                <!-- Форма для загрузки файлов -->
+                <div class="upload-section">
+                    <h3>Загрузка документов</h3>
+                    <form id="fileUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="fileTitle">Название документа:</label>
+                            <input type="text" id="fileTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="fileDescription">Описание:</label>
+                            <textarea id="fileDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="fileUpload">Выберите файл (PDF, DOCX):</label>
+                            <input type="file" id="fileUpload" accept=".pdf,.docx" required>
+                        </div>
+                        <button type="submit" class="upload-btn">
+                            <i class="fas fa-upload"></i> Загрузить документ
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Форма для загрузки видео -->
+                <div class="upload-section">
+                    <h3>Загрузка видео</h3>
+                    <form id="videoUploadForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="videoTitle">Название видео:</label>
+                            <input type="text" id="videoTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="videoDescription">Описание:</label>
+                            <textarea id="videoDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="videoUpload">Выберите видео (MP4):</label>
+                            <input type="file" id="videoUpload" accept="video/mp4" required>
+                        </div>
+                        <button type="submit" class="upload-btn">
+                            <i class="fas fa-film"></i> Загрузить видео
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Форма для создания текстового материала -->
+                <div class="upload-section">
+                    <h3>Создание текстового материала</h3>
+                    <form id="textContentForm" class="upload-form">
+                        <div class="form-group">
+                            <label for="textTitle">Название:</label>
+                            <input type="text" id="textTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="textContent">Содержание:</label>
+                            <div class="editor-toolbar">
+                                <button type="button" data-format="bold"><i class="fas fa-bold"></i></button>
+                                <button type="button" data-format="italic"><i class="fas fa-italic"></i></button>
+                                <button type="button" data-format="underline"><i class="fas fa-underline"></i></button>
+                                <button type="button" data-format="h2"><i class="fas fa-heading"></i></button>
+                                <button type="button" data-format="ul"><i class="fas fa-list-ul"></i></button>
+                                <button type="button" data-format="ol"><i class="fas fa-list-ol"></i></button>
+                            </div>
+                            <div id="textEditor" class="text-editor" contenteditable="true"></div>
+                        </div>
+                        <button type="submit" class="upload-btn">
+                            <i class="fas fa-save"></i> Сохранить материал
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Список загруженных материалов -->
+                <div class="materials-list">
+                    <h3>Загруженные материалы</h3>
+                    <div id="materialsList" class="items-grid">
+                        <!-- Сюда будут добавляться загруженные материалы -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../scripts/menu.js"></script>
+    <script src="../scripts/theory-management.js"></script>
+</body>
+</html>
