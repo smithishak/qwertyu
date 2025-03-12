@@ -218,49 +218,72 @@ app.get('/api/questions/:id', async (req, res) => {
     }
 });
 
+// Обновляем endpoint для редактирования вопроса
 app.put('/api/questions/:id', async (req, res) => {
     try {
+        if (!questionsCollection) {
+            return res.status(500).json({ error: 'База данных не инициализирована' });
+        }
+
         const questionId = req.params.id;
-        console.log('Updating question:', questionId, 'with data:', req.body);
+        console.log('Received question update request:', { id: questionId, body: req.body }); // Debug log
 
         if (!ObjectId.isValid(questionId)) {
-            return res.status(400).json({ error: 'Invalid question ID format' });
+            console.error('Invalid ObjectId:', questionId);
+            return res.status(400).json({ error: 'Неверный формат ID вопроса' });
         }
 
         const { testId, questionText, answers, correctAnswer } = req.body;
 
         // Validate required fields
-        if (!questionText || !Array.isArray(answers) || correctAnswer === undefined) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        if (!testId || !questionText || !Array.isArray(answers) || answers.length === 0) {
+            return res.status(400).json({ error: 'Не все обязательные поля заполнены' });
         }
 
-        const result = await questionsCollection.findOneAndUpdate(
-            { _id: new ObjectId(questionId) },
+        // Convert testId to ObjectId if valid
+        let testObjId;
+        try {
+            testObjId = new ObjectId(testId);
+        } catch (error) {
+            return res.status(400).json({ error: 'Неверный формат ID теста' });
+        }
+
+        const questionObjId = new ObjectId(questionId);
+
+        // Update the question
+        const updateResult = await questionsCollection.updateOne(
+            { _id: questionObjId },
             {
                 $set: {
-                    testId: new ObjectId(testId),
-                    questionText,
-                    answers,
-                    correctAnswer,
+                    testId: testObjId,
+                    questionText: questionText.trim(),
+                    answers: answers.map(a => a.trim()),
+                    correctAnswer: Number(correctAnswer),
                     updatedAt: new Date()
                 }
-            },
-            { 
-                returnDocument: 'after',
-                upsert: false
             }
         );
 
-        if (!result.value) {
-            console.log('Question not found with ID:', questionId);
-            return res.status(404).json({ error: 'Question not found' });
+        console.log('Update result:', updateResult); // Debug log
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(404).json({ error: 'Вопрос не найден' });
         }
 
-        console.log('Update successful:', result.value);
-        res.json(result.value);
+        if (updateResult.modifiedCount === 0) {
+            return res.status(400).json({ error: 'Нет изменений для сохранения' });
+        }
+
+        // Fetch and return the updated question
+        const updatedQuestion = await questionsCollection.findOne({ _id: questionObjId });
+        res.json(updatedQuestion);
+
     } catch (error) {
         console.error('Error updating question:', error);
-        res.status(500).json({ error: 'Server error while updating question' });
+        res.status(500).json({ 
+            error: 'Внутренняя ошибка сервера',
+            details: error.message
+        });
     }
 });
 
@@ -439,19 +462,24 @@ app.get('/api/tests', async (req, res) => {
 });
 
 app.delete('/api/tests/:id', checkAdmin, async (req, res) => {
-    if (!testsCollection) {
-        return res.status(500).json({ error: 'База данных не инициализирована' });
-    }
     try {
-        const result = await testsCollection.deleteOne({
-            _id: new ObjectId(req.params.id)
-        });
+        const testId = new ObjectId(req.params.id);
+        
+        // Находим и удаляем связанные вопросы
+        if (questionsCollection) {
+            await questionsCollection.deleteMany({ testId });
+        }
+
+        // Удаляем сам тест
+        const result = await testsCollection.deleteOne({ _id: testId });
+        
         if (result.deletedCount === 0) {
             return res.status(404).json({ error: 'Тест не найден' });
         }
-        res.json({ success: true });
+
+        res.json({ success: true, message: 'Тест успешно удален' });
     } catch (error) {
-        console.error('Ошибка удаления теста:', error);
+        console.error('Ошибка при удалении теста:', error);
         res.status(500).json({ error: 'Ошибка при удалении теста' });
     }
 });
@@ -459,28 +487,55 @@ app.delete('/api/tests/:id', checkAdmin, async (req, res) => {
 // Обновляем endpoint для редактирования теста
 app.put('/api/tests/:id', checkAdmin, async (req, res) => {
     try {
-        const { title, description, questions, isActive } = req.body;
-        const result = await testsCollection.findOneAndUpdate(
-            { _id: new ObjectId(req.params.id) },
-            { 
-                $set: { 
-                    title, 
-                    description, 
-                    questions: questions ? questions.map(id => new ObjectId(id)) : [],
-                    isActive,
+        if (!testsCollection) {
+            console.error('Tests collection not initialized');
+            return res.status(500).json({ error: 'База данных не инициализирована' });
+        }
+
+        const testId = req.params.id;
+        console.log('Updating test:', testId, req.body); // Debug log
+
+        // Validate ObjectId
+        if (!ObjectId.isValid(testId)) {
+            console.error('Invalid test ID:', testId);
+            return res.status(400).json({ error: 'Неверный формат ID теста' });
+        }
+
+        const { title, description } = req.body;
+
+        if (!title) {
+            return res.status(400).json({ error: 'Название теста обязательно' });
+        }
+
+        // Use updateOne instead of findOneAndUpdate
+        const result = await testsCollection.updateOne(
+            { _id: new ObjectId(testId) },
+            {
+                $set: {
+                    title: title.trim(),
+                    description: description ? description.trim() : '',
                     updatedAt: new Date()
-                } 
-            },
-            { returnDocument: 'after' }
+                }
+            }
         );
 
-        if (!result.value) {
+        console.log('Update result:', result); // Debug log
+
+        if (result.matchedCount === 0) {
             return res.status(404).json({ error: 'Тест не найден' });
         }
-        res.json(result.value);
+
+        if (result.modifiedCount === 0) {
+            return res.status(400).json({ error: 'Нет изменений для сохранения' });
+        }
+
+        // Fetch and return the updated test
+        const updatedTest = await testsCollection.findOne({ _id: new ObjectId(testId) });
+        res.json(updatedTest);
+
     } catch (error) {
-        console.error('Ошибка обновления теста:', error);
-        res.status(500).json({ error: 'Ошибка при обновлении теста' });
+        console.error('Error updating test:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
 });
 

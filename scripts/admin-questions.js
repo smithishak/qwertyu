@@ -16,13 +16,51 @@ let questions = []; // Global questions variable
 async function loadQuestions() {
     try {
         const response = await fetch('/api/questions');
-        questions = await response.json();
-        updateQuestionsList(questions);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const questions = await response.json();
+        if (!Array.isArray(questions)) {
+            throw new Error('Получен неверный формат данных');
+        }
+
+        const questionsList = document.getElementById('questionsList');
+        if (!questionsList) {
+            throw new Error('Элемент questionsList не найден');
+        }
+
+        questionsList.innerHTML = questions.map(question => `
+            <div class="question-card" data-question-id="${question._id}">
+                <div class="question-content">
+                    <div class="question-text">${escapeHtml(question.questionText)}</div>
+                    <div class="answers-grid">
+                        ${Array.isArray(question.answers) ? 
+                            question.answers.map((answer, i) => `
+                                <div class="answer-item ${i === question.correctAnswer ? 'correct' : ''}">
+                                    ${escapeHtml(answer)}
+                                </div>
+                            `).join('') : 
+                            '<div class="error">Ответы не найдены</div>'}
+                    </div>
+                </div>
+                <div class="question-actions">
+                    <button onclick="editQuestion('${question._id}')" class="edit-btn">
+                        <i class="fas fa-edit"></i>
+                        <span>Редактировать</span>
+                    </button>
+                    <button onclick="deleteQuestion('${question._id}')" class="delete-btn">
+                        <i class="fas fa-trash"></i>
+                        <span>Удалить</span>
+                    </button>
+                </div>
+            </div>
+        `).join('') || '<div class="no-questions">Нет доступных вопросов</div>';
     } catch (error) {
         console.error('Ошибка при загрузке вопросов:', error);
         const questionsList = document.getElementById('questionsList');
         if (questionsList) {
-            questionsList.innerHTML = '<div class="error-message">Ошибка при загрузке вопросов</div>';
+            questionsList.innerHTML = `<div class="error-message">Ошибка при загрузке вопросов: ${error.message}</div>`;
         }
     }
 }
@@ -192,12 +230,12 @@ document.addEventListener('DOMContentLoaded', async function() {
                     `;
                 });
             }
-
-            // Обновляем список тестов
-            updateTestsList(tests);
-        } catch (err) {
-            console.error("Ошибка при загрузке тестов:", err);
-            alert('Ошибка при загрузке списка тестов');
+        } catch (error) {
+            console.error('Ошибка при загрузке тестов:', error);
+            const testSelect = document.querySelector('select[name="testId"]');
+            if (testSelect) {
+                testSelect.innerHTML = '<option value="">Ошибка загрузки тестов</option>';
+            }
         }
     }
 
@@ -212,7 +250,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Функция фильтрации вопросов
     function filterQuestions() {
         const searchQuery = questionSearch.value.toLowerCase();
-        const filterValue = questionFilter.value;
+                                              const filterValue = questionFilter.value;
 
         const filteredQuestions = questions.filter(question => {
             const matchesSearch = question.questionText.toLowerCase().includes(searchQuery);
@@ -243,8 +281,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             return matchesSearch && matchesFilter;
         });
 
-        console.log('Найдено тестов:', filteredTests.length); // Для отладки
-        updateTestsList(filteredTests);
+     
     }
 
     function updateQuestionsList(filteredQuestions) {
@@ -304,29 +341,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Обновляем функцию updateTestsList
-    function updateTestsList(filteredTests) {
-        const testsList = document.getElementById('testsList');
-        if (!testsList) return;
-
-        testsList.innerHTML = filteredTests.map(test => `
-            <div class="test-card" data-test-id="${escapeHtml(test._id)}">
-                <h3>${escapeHtml(test.title)}</h3>
-                <p>${escapeHtml(test.description || '')}</p>
-                <div class="test-questions">
-                    <span>Вопросов: ${test.questions ? test.questions.length : 0}</span>
-                </div>
-                <div class="action-buttons">
-                    <button class="icon-btn edit-btn" data-id="${escapeHtml(test._id)}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="icon-btn delete-btn" data-id="${escapeHtml(test._id)}">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
+    // Обновляем функцию 
+   
 
     // Добавляем слушатели событий для поиска
     questionSearch.addEventListener('input', filterQuestions);
@@ -423,48 +439,76 @@ async function editQuestion(questionId) {
             }
         });
 
-        // Обработчик отправки формы
+        // Обработчик отправки формы в функции editQuestion
         form.onsubmit = async (e) => {
             e.preventDefault();
             try {
                 const questionId = form.elements.questionId.value;
-                if (!questionId) {
-                    throw new Error('Question ID is missing');
+                const testId = form.elements.testId.value;
+
+                if (!questionId || !testId) {
+                    throw new Error('Не все обязательные поля заполнены');
+                }
+
+                // Validate IDs
+                if (!questionId.match(/^[0-9a-fA-F]{24}$/) || !testId.match(/^[0-9a-fA-F]{24}$/)) {
+                    throw new Error('Неверный формат ID');
+                }
+
+                const answers = Array.from(form.querySelectorAll('#editAnswersContainer input[type="text"]'))
+                    .map(input => input.value.trim())
+                    .filter(answer => answer.length > 0);
+
+                if (answers.length === 0) {
+                    throw new Error('Добавьте хотя бы один вариант ответа');
+                }
+
+                const selectedAnswer = form.querySelector('input[name="correctAnswer"]:checked');
+                if (!selectedAnswer) {
+                    throw new Error('Выберите правильный ответ');
                 }
 
                 const questionData = {
-                    testId: form.elements.testId.value,
-                    questionText: form.elements.questionText.value,
-                    answers: Array.from(form.querySelectorAll('#editAnswersContainer input[type="text"]')).map(i => i.value),
-                    correctAnswer: parseInt(form.querySelector('input[name="correctAnswer"]:checked')?.value || '0')
+                    testId,
+                    questionText: form.elements.questionText.value.trim(),
+                    answers,
+                    correctAnswer: parseInt(selectedAnswer.value)
                 };
 
-                console.log('Sending update request for question:', questionId);
-                console.log('Question data:', questionData);
+                console.log('Sending update request:', { questionId, data: questionData }); // Debug log
 
                 const response = await fetch(`/api/questions/${questionId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(questionData)
+                    body: JSON.stringify(questionData),
+                    credentials: 'same-origin'
                 });
 
-                const contentType = response.headers.get('content-type');
-                const responseData = contentType?.includes('application/json') ? 
-                    await response.json() : 
-                    null;
-
                 if (!response.ok) {
-                    throw new Error(responseData?.error || `Server error: ${response.status}`);
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || errorData.details || 'Ошибка при обновлении вопроса');
                 }
 
-                modal.style.display = 'none';
+                const data = await response.json();
+                console.log('Server response:', data); // Debug log
+
+                // Update UI
                 await loadQuestions();
-                alert('Question updated successfully');
+                modal.style.display = 'none';
+
+                // Show success notification
+                const notification = document.createElement('div');
+                notification.className = 'success-notification';
+                notification.textContent = 'Вопрос успешно обновлен';
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+
             } catch (error) {
-                console.error('Error saving question:', error);
-                alert(`Error saving question: ${error.message}`);
+                console.error('Error updating question:', error);
+                alert(error.message);
             }
         };
 
@@ -494,3 +538,39 @@ function toggleQuestionDetails(header) {
 
 // Make the function available globally
 window.toggleQuestionDetails = toggleQuestionDetails;
+
+// Определяем функцию updateQuestionsList глобально
+function updateQuestionsList(questions) {
+    const questionsList = document.getElementById('questionsList');
+    if (!questionsList) return;
+
+    questionsList.innerHTML = questions.map(question => `
+        <div class="question-card">
+            <div class="question-content">
+                <div class="question-text">${escapeHtml(question.questionText)}</div>
+                <div class="answers-grid">
+                    ${Array.isArray(question.answers) ? 
+                        question.answers.map((answer, i) => `
+                            <div class="answer-item ${i === question.correctAnswer ? 'correct' : ''}">
+                                ${escapeHtml(answer)}
+                            </div>
+                        `).join('') : 
+                        ''}
+                </div>
+            </div>
+            <div class="question-actions">
+                <button class="edit-btn" onclick="editQuestion('${question._id}')" style="background-color: #3498db;">
+                    <i class="fas fa-edit"></i>
+                    <span>Редактировать</span>
+                </button>
+                <button class="delete-btn" onclick="deleteQuestion('${question._id}')" style="background-color: #e74c3c;">
+                    <i class="fas fa-trash"></i>
+                    <span>Удалить</span>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Make the function available globally
+window.updateQuestionsList = updateQuestionsList;

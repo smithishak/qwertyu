@@ -36,12 +36,12 @@
                         <h2><i class="fas fa-plus-circle"></i> Создать тест</h2>
                         <form id="addTestForm" class="add-test-form">
                             <div class="form-group">
-                                <label><i class="fas fa-heading"></i> Название теста:</label>
-                                <input type="text" name="testTitle" placeholder="Введите название теста" required>
+                                <label for="testTitle"><i class="fas fa-heading"></i> Название теста:</label>
+                                <input type="text" id="testTitle" name="testTitle" placeholder="Введите название теста" required>
                             </div>
                             <div class="form-group">
-                                <label><i class="fas fa-info-circle"></i> Описание теста:</label>
-                                <textarea name="testDescription" placeholder="Введите описание теста"></textarea>
+                                <label for="testDescription"><i class="fas fa-info-circle"></i> Описание теста:</label>
+                                <textarea id="testDescription" name="testDescription" placeholder="Введите описание теста"></textarea>
                             </div>
                             <button type="submit">
                                 <i class="fas fa-save"></i> Создать тест
@@ -54,29 +54,23 @@
                         <h2><i class="fas fa-plus-circle"></i> Добавить вопрос</h2>
                         <form id="addQuestionForm" class="add-question-form">
                             <div class="form-group">
-                                <label><i class="fas fa-list"></i> Выберите тест:</label>
-                                <select name="testId" required>
+                                <label for="testSelect"><i class="fas fa-list"></i> Выберите тест:</label>
+                                <select id="testSelect" name="testId" required>
                                     <option value="">Выберите тест</option>
                                     <!-- Опции будут добавлены динамически -->
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label><i class="fas fa-question"></i> Текст вопроса:</label>
+                                <label for="questionText"><i class="fas fa-question"></i> Текст вопроса:</label>
                                 <textarea id="questionText" name="questionText" placeholder="Введите текст вопроса" required></textarea>
                             </div>
                             <div id="answersContainer">
-                                <div class="form-group answer-group">
-                                    <input type="text" name="answer1" placeholder="Введите вариант ответа" required>
-                                    <div class="radio-container">
-                                        <input type="radio" name="correctAnswer" value="0" required>
-                                        <span class="radio-label">Правильный ответ</span>
-                                    </div>
-                                </div>
+                                <!-- Ответы будут добавляться динамически -->
                             </div>
-                            <button type="button" id="addAnswerBtn">
+                            <button type="button" id="addAnswerBtn" class="action-btn">
                                 <i class="fas fa-plus"></i> Добавить вариант ответа
                             </button>
-                            <button type="submit">
+                            <button type="submit" class="submit-btn">
                                 <i class="fas fa-save"></i> Создать вопрос
                             </button>
                         </form>
@@ -140,6 +134,27 @@
                 <div class="modal-buttons">
                     <button type="submit" class="save-btn">Сохранить</button>
                     <button type="button" class="cancel-btn" id="cancelEditBtn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- Модальное окно для редактирования теста -->
+    <div id="editTestModal" class="modal">
+        <div class="modal-content">
+            <h3>Редактировать тест</h3>
+            <form id="editTestForm" class="edit-test-form">
+                <input type="hidden" name="testId">
+                <div class="form-group">
+                    <label><i class="fas fa-heading"></i> Название теста:</label>
+                    <input type="text" name="testTitle" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-info-circle"></i> Описание теста:</label>
+                    <textarea name="testDescription"></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit" class="save-btn">Сохранить</button>
+                    <button type="button" class="cancel-btn" id="cancelEditTestBtn">Отмена</button>
                 </div>
             </form>
         </div>
