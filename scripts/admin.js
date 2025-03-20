@@ -1,24 +1,66 @@
 document.addEventListener('DOMContentLoaded', async function() {
-    // Функция для обновления статистики
-    async function updateStatistics() {
+    // Load user statistics
+    async function loadUserStats() {
         try {
-            // Получаем статистику пользователей
-            const usersResponse = await fetch('/api/admin/statistics/users');
-            const usersData = await usersResponse.json();
-            
-            // Получаем статистику тестов
-            const testsResponse = await fetch('/api/admin/statistics/tests');
-            const testsData = await testsResponse.json();
+            const response = await fetch('/api/admin/statistics/users');
+            if (!response.ok) throw new Error('Failed to load user statistics');
+            const data = await response.json();
+            document.getElementById('totalUsers').textContent = data.totalUsers || 0;
+            document.getElementById('activeUsers').textContent = data.activeUsers || 0;
+        } catch (error) {
+            console.error('Error loading user stats:', error);
+        }
+    }
 
-            // Обновляем данные на странице
-            document.getElementById('totalUsers').textContent = usersData.totalUsers || 0;
-            document.getElementById('activeUsers').textContent = usersData.activeUsers || 0;
-            document.getElementById('totalQuestions').textContent = testsData.totalQuestions || 0;
-            document.getElementById('completedTests').textContent = testsData.completedTests || 0;
+    // Load test statistics
+    async function loadTestStats() {
+        try {
+            const response = await fetch('/api/admin/statistics/tests');
+            if (!response.ok) throw new Error('Failed to load test statistics');
+            const data = await response.json();
+            document.getElementById('totalQuestions').textContent = data.totalQuestions || 0;
+            document.getElementById('completedTests').textContent = data.completedTests || 0;
+        } catch (error) {
+            console.error('Error loading test stats:', error);
+        }
+    }
+
+    // Load test completion statistics
+    async function loadTestCompletionStats() {
+        try {
+            const response = await fetch('/api/admin/statistics/test-completions');
+            if (!response.ok) {
+                throw new Error('Failed to load completion statistics');
+            }
+            
+            const data = await response.json();
+            console.log('Test completion stats:', data); // Debug log
+
+            // Update the statistics display
+            document.getElementById('averageScore').textContent = 
+                `${data.averageScore || 0}%`;
+            document.getElementById('bestScore').textContent = 
+                `${data.bestScore || 0}%`;
 
         } catch (error) {
-            console.error('Ошибка при получении статистики:', error);
-            showNotification('Ошибка при загрузке статистики', 'error');
+            console.error('Error loading completion stats:', error);
+            // Set default values if there's an error
+            document.getElementById('averageScore').textContent = '0%';
+            document.getElementById('bestScore').textContent = '0%';
+        }
+    }
+
+    // Update the loadStatistics function
+    async function loadStatistics() {
+        try {
+            await Promise.all([
+                loadUserStats(),
+                loadTestStats(),
+                loadTestCompletionStats()
+            ]);
+            console.log('All statistics loaded successfully');
+        } catch (error) {
+            console.error('Error loading statistics:', error);
         }
     }
 
@@ -49,9 +91,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Запускаем обновление статистики при загрузке страницы
-    updateStatistics();
+    // Start loading statistics when page loads
+    loadStatistics();
 
-    // Обновляем статистику каждые 5 минут
-    setInterval(updateStatistics, 300000);
+    // Refresh statistics every 5 minutes
+    setInterval(loadStatistics, 300000);
+    
+    // Ensure statistics are loaded immediately and refreshed regularly
+    loadStatistics();
+    setInterval(loadStatistics, 60000); // Refresh every minute
 });

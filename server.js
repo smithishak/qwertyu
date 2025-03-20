@@ -608,6 +608,46 @@ app.get('/api/admin/statistics/tests', checkAdmin, async (req, res) => {
     }
 });
 
+// Add new endpoint for test completion statistics
+app.get('/api/admin/statistics/test-completions', checkAdmin, async (req, res) => {
+    try {
+        const testResults = await db.collection('test_results').find({
+            completed: true
+        }).toArray();
+
+        const totalCompletions = testResults.length;
+        let totalScore = 0;
+        let bestScore = 0;
+
+        if (totalCompletions > 0) {
+            testResults.forEach(result => {
+                if (result.correctAnswers && result.totalQuestions) {
+                    const score = Math.round((result.correctAnswers / result.totalQuestions) * 100);
+                    totalScore += score;
+                    bestScore = Math.max(bestScore, score);
+                }
+            });
+
+            const averageScore = Math.round(totalScore / totalCompletions);
+
+            res.json({
+                totalCompletions,
+                averageScore,
+                bestScore
+            });
+        } else {
+            res.json({
+                totalCompletions: 0,
+                averageScore: 0,
+                bestScore: 0
+            });
+        }
+    } catch (error) {
+        console.error('Ошибка при получении статистики:', error);
+        res.status(500).json({ error: 'Ошибка сервера' });
+    }
+});
+
 // Маршрут для создания резервной копии
 app.post('/api/admin/backup', checkAdmin, async (req, res) => {
     try {
@@ -798,33 +838,124 @@ app.get('/api/materials/:id/download', async (req, res) => {
 
 app.delete('/api/materials/:id', checkAdmin, async (req, res) => {
     try {
-        let material = await documentsCollection.findOne({
-            _id: new ObjectId(req.params.id)
-        });
-        let collection = documentsCollection;
+        const materialId = new ObjectId(req.params.id);
+        let material = null;
+        let collection = null;
 
+        // Check documents collection
+        material = await documentsCollection.findOne({ _id: materialId });
+        if (material) {
+            collection = documentsCollection;
+        }
+
+        // If not found in documents, check videos collection
         if (!material) {
-            material = await videosCollection.findOne({
-                _id: new ObjectId(req.params.id)
-            });
-            collection = videosCollection;
+            material = await videosCollection.findOne({ _id: materialId });
+            if (material) {
+                collection = videosCollection;
+            }
+        }
+
+        // If not found in videos, check materials collection (for text materials)
+        if (!material) {
+            material = await materialsCollection.findOne({ _id: materialId });
+            if (material) {
+                collection = materialsCollection;
+            }
         }
 
         if (!material) {
             return res.status(404).json({ error: 'Материал не найден' });
         }
 
-        await gridFSBucket.delete(material.fileId);
-        await collection.deleteOne({ _id: new ObjectId(req.params.id) });
-        res.json({ success: true });
+        // Delete file from GridFS if it exists
+        if (material.fileId) {
+            try {
+                await gridFSBucket.delete(material.fileId);
+            } catch (error) {
+                console.error('Error deleting file from GridFS:', error);
+            }
+        }
+
+        // Delete the material from its collection
+        const result = await collection.deleteOne({ _id: materialId });
+        
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ error: 'Не удалось удалить материал' });
+        }
+
+        res.json({ 
+            success: true,
+            message: 'Материал успешно удален'
+        });
+
     } catch (error) {
-        console.error('Ошибка при удалении:', error);
-        res.status(500).json({ error: 'Ошибка при удалении материала' });
+        console.error('Error deleting material:', error);
+        res.status(500).json({ 
+            error: 'Ошибка при удалении материала',
+            details: error.message
+        });
     }
 });
 
 const materialsRouter = require('./routes/materials');
 app.use('/api/materials', materialsRouter);
+
+// Add new endpoint for submitting test results
+app.post('/api/test-results', async (req, res) => {
+    try {
+        const { testId, answers } = req.body;
+
+        if (!testId || !answers || typeof answers !== 'object') {
+            return res.status(400).json({ error: 'Некорректные данные' });
+        }
+
+        // Get test questions
+        const test = await testsCollection.findOne({
+            _id: new ObjectId(testId)
+        });
+
+        if (!test) {
+            return res.status(404).json({ error: 'Тест не найден' });
+        }
+
+        // Get questions and verify answers
+        const questions = await questionsCollection
+            .find({ _id: { $in: test.questions.map(id => new ObjectId(id)) } })
+            .toArray();
+
+        let correctAnswers = 0;
+        const totalQuestions = questions.length;
+
+        questions.forEach(question => {
+            const userAnswer = answers[question._id.toString()];
+            if (userAnswer === question.correctAnswer) {
+                correctAnswers++;
+            }
+        });
+
+        // Save test result
+        const result = await db.collection('test_results').insertOne({
+            testId: new ObjectId(testId),
+            answers,
+            correctAnswers,
+            totalQuestions,
+            completed: true,
+            completedAt: new Date()
+        });
+
+        res.json({
+            success: true,
+            correctAnswers,
+            totalQuestions,
+            percentage: Math.round((correctAnswers / totalQuestions) * 100)
+        });
+
+    } catch (error) {
+        console.error('Error submitting test results:', error);
+        res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
 
 // Обновленные маршруты в правильном порядке
 // 1. Разрешаем доступ к статическим файлам для страницы логина

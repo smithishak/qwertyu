@@ -61,17 +61,20 @@
                         </div>
                     </div>
                 </div>
+                <!-- Add new statistics container -->
                 <div class="container-1">
-                    <h3>Системные настройки</h3>
-                    <div class="quick-actions">
-                        <button class="action-btn backup-btn"> <!-- Added backup-btn class -->
-                            <i class="fas fa-database"></i>
-                            Резервное копирование
-                        </button>
-                        <button class="action-btn settings-btn"> <!-- Added settings-btn class -->
-                            <i class="fas fa-cog"></i>
-                            Настройки системы
-                        </button>
+                    <h3>Статистика прохождения</h3>
+                    <div class="stats">
+                        <div class="stat-item">
+                            <i class="fas fa-chart-line"></i>
+                            <span id="averageScore">0%</span>
+                            <p>Средний результат</p>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-trophy"></i>
+                            <span id="bestScore">0%</span>
+                            <p>Лучший результат</p>
+                        </div>
                     </div>
                 </div>
             </div>

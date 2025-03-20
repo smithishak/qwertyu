@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             return `
-                <div class="material-card">
+                <div class="material-card" data-material-id="${material._id}">
                     <h4>${material.title}</h4>
                     ${material.type === 'text' ? 
                         `<div class="text-preview">${material.content.substring(0, 200)}...</div>` :
@@ -173,24 +173,43 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Функция удаления материала
-    window.deleteMaterial = async (materialId) => {
-        if (confirm('Вы уверены, что хотите удалить этот материал?')) {
-            try {
-                const response = await fetch(`/api/materials/${materialId}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    loadMaterials(); // Обновляем список после удаления
-                } else {
-                    throw new Error('Ошибка при удалении материала');
-                }
-            } catch (error) {
-                console.error('Ошибка:', error);
-                alert('Произошла ошибка при удалении материала');
-            }
+    window.deleteMaterial = async function(materialId) {
+        if (!materialId || !confirm('Вы уверены, что хотите удалить этот материал?')) {
+            return;
         }
-    };
+
+        try {
+            const response = await fetch(`/api/materials/${materialId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Ошибка при удалении материала');
+            }
+
+            const result = await response.json();
+            
+            if (result.success) {
+                // Remove the material card from the DOM
+                const materialCard = document.querySelector(`[data-material-id="${materialId}"]`);
+                if (materialCard) {
+                    materialCard.remove();
+                }
+                alert('Материал успешно удален');
+                // Optionally reload the materials list
+                await loadMaterials();
+            } else {
+                throw new Error(result.error || 'Не удалось удалить материал');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert(`Ошибка при удалении материала: ${error.message}`);
+        }
+    }
 
     // Загружаем материалы при загрузке страницы
     loadMaterials();

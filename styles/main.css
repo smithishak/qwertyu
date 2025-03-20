@@ -15,6 +15,26 @@ body {
     background-color: var(--background-color);
 }
 
+/* Prevent text selection */
+body * {
+    -webkit-user-select: none;  /* Safari */
+    -moz-user-select: none;     /* Firefox */
+    -ms-user-select: none;      /* IE/Edge */
+    user-select: none;          /* Standard syntax */
+}
+
+/* Allow text selection in specific elements where it's needed */
+input, 
+textarea, 
+.question-text, 
+.answer-text,
+[contenteditable="true"] {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+
 header {
     background-color: var(--primary-color);
     color: white;
