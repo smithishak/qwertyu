@@ -15,47 +15,31 @@ let questions = []; // Global questions variable
 // Helper function to load questions
 async function loadQuestions() {
     try {
-        const response = await fetch('/api/questions');
+        const response = await fetch('/api/questions', {
+            credentials: 'include', // Add credentials for authentication
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+
         if (!response.ok) {
+            if (response.status === 401) {
+                window.location.href = '/login.html'; // Redirect to login if unauthorized
+                return;
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        const questions = await response.json();
-        if (!Array.isArray(questions)) {
-            throw new Error('Получен неверный формат данных');
-        }
+        const data = await response.json();
+        questions = Array.isArray(data) ? data : []; // Ensure questions is always an array
 
         const questionsList = document.getElementById('questionsList');
         if (!questionsList) {
             throw new Error('Элемент questionsList не найден');
         }
 
-        questionsList.innerHTML = questions.map(question => `
-            <div class="question-card" data-question-id="${question._id}">
-                <div class="question-content">
-                    <div class="question-text">${escapeHtml(question.questionText)}</div>
-                    <div class="answers-grid">
-                        ${Array.isArray(question.answers) ? 
-                            question.answers.map((answer, i) => `
-                                <div class="answer-item ${i === question.correctAnswer ? 'correct' : ''}">
-                                    ${escapeHtml(answer)}
-                                </div>
-                            `).join('') : 
-                            '<div class="error">Ответы не найдены</div>'}
-                    </div>
-                </div>
-                <div class="question-actions">
-                    <button onclick="editQuestion('${question._id}')" class="edit-btn">
-                        <i class="fas fa-edit"></i>
-                        <span>Редактировать</span>
-                    </button>
-                    <button onclick="deleteQuestion('${question._id}')" class="delete-btn">
-                        <i class="fas fa-trash"></i>
-                        <span>Удалить</span>
-                    </button>
-                </div>
-            </div>
-        `).join('') || '<div class="no-questions">Нет доступных вопросов</div>';
+        updateQuestionsList(questions); // Use the global questions array
     } catch (error) {
         console.error('Ошибка при загрузке вопросов:', error);
         const questionsList = document.getElementById('questionsList');
@@ -97,6 +81,38 @@ function createActionButtons(questionId) {
     `;
 }
 
+// Add this before the DOMContentLoaded event listener
+window.deleteQuestion = async function(questionId) {
+    if (!questionId || !confirm('Вы уверены, что хотите удалить этот вопрос?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/questions/${questionId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include' // Add this line to include credentials
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                throw new Error('Необходима авторизация');
+            }
+            const data = await response.json();
+            throw new Error(data.error || 'Ошибка при удалении вопроса');
+        }
+
+        // Перезагружаем список вопросов после успешного удаления
+        await loadQuestions();
+        alert('Вопрос успешно удален');
+    } catch (error) {
+        console.error('Ошибка при удалении вопроса:', error);
+        alert('Ошибка при удалении вопроса: ' + error.message);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', async function() {
     // Проверяем статус подключения к БД
     try {
@@ -117,97 +133,123 @@ document.addEventListener('DOMContentLoaded', async function() {
     let answerCount = 1;
 
     // Добавление нового варианта ответа
-    addAnswerBtn.addEventListener('click', () => {
-        answerCount++;
-        const answerGroup = document.createElement('div');
-        answerGroup.className = 'form-group answer-group';
-        answerGroup.innerHTML = `
-            <label>Вариант ответа ${answerCount}:</label>
-            <input type="text" name="answer${answerCount}" required>
-            <input type="radio" name="correctAnswer" value="${answerCount - 1}" required>
-            <label class="radio-label">Правильный ответ</label>
-            <button type="button" class="remove-answer">Удалить</button>
-        `;
-        answersContainer.appendChild(answerGroup);
-    });
-
-    // Удаление варианта ответа
-    answersContainer.addEventListener('click', (e) => {
-        if (e.target.classList.contains('remove-answer')) {
-            e.target.parentElement.remove();
-        }
-    });
-
-    // Отправка формы
-    addQuestionForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const formData = new FormData(addQuestionForm);
-        const questionData = {
-            testId: formData.get('testId'),
-            questionText: formData.get('questionText'),
-            answers: [],
-            correctAnswer: parseInt(formData.get('correctAnswer'))
-        };
-
-        // Собираем все варианты ответов
-        const answerInputs = addQuestionForm.querySelectorAll('input[type="text"]');
-        answerInputs.forEach(input => {
-            questionData.answers.push(input.value);
+    if (addAnswerBtn && answersContainer) {
+        addAnswerBtn.addEventListener('click', () => {
+            answerCount++;
+            const answerGroup = document.createElement('div');
+            answerGroup.className = 'form-group answer-group';
+            answerGroup.innerHTML = `
+                <label>Вариант ответа ${answerCount}:</label>
+                <input type="text" name="answer${answerCount}" required>
+                <input type="radio" name="correctAnswer" value="${answerCount - 1}" required>
+                <label class="radio-label">Правильный ответ</label>
+                <button type="button" class="remove-answer">Удалить</button>
+            `;
+            answersContainer.appendChild(answerGroup);
         });
 
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        const editId = submitBtn.dataset.editId;
+        // Удаление варианта ответа
+        answersContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-answer')) {
+                e.target.parentElement.remove();
+            }
+        });
+    }
 
-        try {
-            const url = editId ? `/api/questions/${editId}` : '/api/questions';
-            const method = editId ? 'PUT' : 'POST';
+    // Отправка формы
+    if (addQuestionForm) {
+        addQuestionForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
             
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(questionData)
+            const formData = new FormData(addQuestionForm);
+            const questionData = {
+                testId: formData.get('testId'),
+                questionText: formData.get('questionText'),
+                answers: [],
+                correctAnswer: parseInt(formData.get('correctAnswer'))
+            };
+
+            // Собираем все варианты ответов
+            const answerInputs = addQuestionForm.querySelectorAll('input[type="text"]');
+            answerInputs.forEach(input => {
+                questionData.answers.push(input.value);
             });
 
-            const result = await response.json();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const editId = submitBtn.dataset.editId;
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Ошибка при сохранении вопроса');
+            try {
+                const url = editId ? `/api/questions/${editId}` : '/api/questions';
+                const method = editId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(questionData)
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Ошибка при сохранении вопроса');
+                }
+
+                alert(editId ? 'Вопрос успешно обновлен' : 'Вопрос успешно добавлен');
+                
+                // Очищаем форму только после успешного сохранения
+                addQuestionForm.reset();
+                submitBtn.innerHTML = '<i class="fas fa-plus"></i> Создать вопрос';
+                delete submitBtn.dataset.editId;
+                await loadQuestions(); // Перезагружаем список вопросов
+                
+                // Очищаем контейнер с ответами
+                const answersContainer = document.getElementById('answersContainer');
+                answersContainer.innerHTML = '';
+                // Добавляем первый вариант ответа
+                addAnswerField();
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert(error.message);
             }
-
-            alert(editId ? 'Вопрос успешно обновлен' : 'Вопрос успешно добавлен');
-            
-            // Очищаем форму только после успешного сохранения
-            addQuestionForm.reset();
-            submitBtn.innerHTML = '<i class="fas fa-plus"></i> Создать вопрос';
-            delete submitBtn.dataset.editId;
-            await loadQuestions(); // Перезагружаем список вопросов
-            
-            // Очищаем контейнер с ответами
-            const answersContainer = document.getElementById('answersContainer');
-            answersContainer.innerHTML = '';
-            // Добавляем первый вариант ответа
-            addAnswerField();
-            
-        } catch (error) {
-            console.error('Ошибка:', error);
-            alert(error.message);
-        }
-    });
+        });
+    }
 
     // Загрузка существующих вопросов
     async function loadQuestions() {
         try {
-            const response = await fetch('/api/questions');  // Изменен путь
-            questions = await response.json(); // Сохраняем все вопросы
-            updateQuestionsList(questions);
+            const response = await fetch('/api/questions', {
+                credentials: 'include', // Add credentials for authentication
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login.html'; // Redirect to login if unauthorized
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            questions = Array.isArray(data) ? data : []; // Ensure questions is always an array
+
+            const questionsList = document.getElementById('questionsList');
+            if (!questionsList) {
+                throw new Error('Элемент questionsList не найден');
+            }
+
+            updateQuestionsList(questions); // Use the global questions array
         } catch (error) {
             console.error('Ошибка при загрузке вопросов:', error);
             const questionsList = document.getElementById('questionsList');
             if (questionsList) {
-                questionsList.innerHTML = '<tr><td colspan="3">Ошибка при загрузке вопросов</td></tr>';
+                questionsList.innerHTML = `<div class="error-message">Ошибка при загрузке вопросов: ${error.message}</div>`;
             }
         }
     }
@@ -215,10 +257,26 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Заменяем функцию загрузки тестов для select
     async function loadTests() {
         try {
-            const response = await fetch('/api/tests');
-            tests = await response.json(); // Сохраняем в глобальную переменную tests
+            const response = await fetch('/api/tests', {
+                credentials: 'include', // Add credentials for authentication
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
 
-            // Обновляем select для создания вопросов
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.location.href = '/login.html'; // Redirect to login if unauthorized
+                    return;
+                }
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            tests = Array.isArray(data) ? data : []; // Ensure tests is always an array
+
+            // Update select for creating questions
             const testSelect = document.querySelector('select[name="testId"]');
             if (testSelect) {
                 testSelect.innerHTML = '<option value="">Выберите тест</option>';
@@ -306,7 +364,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                         <i class="fas fa-edit"></i>
                         <span>Редактировать</span>
                     </button>
-                    <button class="delete-btn" onclick="deleteQuestion('${question._id}')" style="background-color: #e74c3c;">
+                    <button class="delete-btn" data-question-id="${question._id}" style="background-color: #e74c3c;">
                         <i class="fas fa-trash"></i>
                         <span>Удалить</span>
                     </button>
@@ -314,26 +372,42 @@ document.addEventListener('DOMContentLoaded', async function() {
             </div>
         `).join('');
 
-        // Добавляем обработчики для кнопок
+        // Update delete button handlers
         const deleteButtons = questionsList.querySelectorAll('.delete-btn');
         deleteButtons.forEach(button => {
             button.addEventListener('click', async (e) => {
-                e.stopPropagation(); // Предотвращаем всплытие события
-                const questionCard = e.target.closest('.question-card');
-                const questionId = e.target.getAttribute('onclick').match(/'([^']+)'/)[1];
+                e.preventDefault();
+                e.stopPropagation();
                 
+                const questionId = button.dataset.questionId;
+                if (!questionId) {
+                    console.error('ID вопроса не найден');
+                    return;
+                }
+
                 if (confirm('Вы уверены, что хотите удалить этот вопрос?')) {
                     try {
                         const response = await fetch(`/api/questions/${questionId}`, {
-                            method: 'DELETE'
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            credentials: 'include'
                         });
-                        if (response.ok) {
-                            questionCard.remove();
-                        } else {
-                            throw new Error('Ошибка при удалении вопроса');
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
+
+                        // Remove the question card from DOM
+                        const questionCard = button.closest('.question-card');
+                        if (questionCard) {
+                            questionCard.remove();
+                        }
+
+                        await loadQuestions(); // Reload the questions list
                     } catch (error) {
-                        console.error('Ошибка:', error);
+                        console.error('Ошибка при удалении:', error);
                         alert('Ошибка при удалении вопроса');
                     }
                 }
@@ -563,13 +637,55 @@ function updateQuestionsList(questions) {
                     <i class="fas fa-edit"></i>
                     <span>Редактировать</span>
                 </button>
-                <button class="delete-btn" onclick="deleteQuestion('${question._id}')" style="background-color: #e74c3c;">
+                <button class="delete-btn" data-question-id="${question._id}" style="background-color: #e74c3c;">
                     <i class="fas fa-trash"></i>
                     <span>Удалить</span>
                 </button>
             </div>
         </div>
     `).join('');
+
+    // Update delete button handlers
+    const deleteButtons = questionsList.querySelectorAll('.delete-btn');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const questionId = button.dataset.questionId;
+            if (!questionId) {
+                console.error('ID вопроса не найден');
+                return;
+            }
+
+            if (confirm('Вы уверены, что хотите удалить этот вопрос?')) {
+                try {
+                    const response = await fetch(`/api/questions/${questionId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include'
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    // Remove the question card from DOM
+                    const questionCard = button.closest('.question-card');
+                    if (questionCard) {
+                        questionCard.remove();
+                    }
+
+                    await loadQuestions(); // Reload the questions list
+                } catch (error) {
+                    console.error('Ошибка при удалении:', error);
+                    alert('Ошибка при удалении вопроса');
+                }
+            }
+        });
+    });
 }
 
 // Make the function available globally

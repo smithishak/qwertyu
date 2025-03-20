@@ -131,9 +131,21 @@ header {
 }
 
 .test-section {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
+    flex: 1;
+    padding: 30px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.test-section h2 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--secondary-color);
 }
 
 .questions-list {
@@ -234,13 +246,121 @@ header {
 }
 
 .tests-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-    padding: 20px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 25px;
+    padding: 10px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
+.test-card {
+    flex: 0 0 400px; /* фиксированная ширина карточки */
+    max-width: 400px;
+    height: fit-content;
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    position: relative;
+    transition: all 0.3s ease;
+    border: 1px solid #eef2f7;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow: hidden;
+}
 
+.test-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at top right, 
+        rgba(46, 204, 113, 0.1) 0%, 
+        rgba(46, 204, 113, 0) 70%);
+    pointer-events: none;
+}
+
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.test-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.test-description {
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+    flex-grow: 1;
+}
+
+.test-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eef2f7;
+    font-size: 14px;
+    color: #64748b;
+    flex-wrap: wrap; /* Добавляем перенос элементов */
+}
+
+.test-meta span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.test-meta i {
+    color: var(--secondary-color);
+}
+
+.test-date {
+    font-size: 12px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto; /* Прижимаем дату к правому краю */
+}
+
+.start-test-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.start-test-btn:hover {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.start-test-btn i {
+    font-size: 16px;
+}
 
 .test-actions button {
     flex: 1;
@@ -279,6 +399,25 @@ header {
 }
 
 .start-test-btn:hover {
+    background: var(--primary-color);
+}
+
+/* Стилизуем скроллбар */
+.tests-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.tests-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.tests-grid::-webkit-scrollbar-thumb {
+    background: var(--secondary-color);
+    border-radius: 4px;
+}
+
+.tests-grid::-webkit-scrollbar-thumb:hover {
     background: var(--primary-color);
 }
 
@@ -511,10 +650,11 @@ materials-grid {
     }
 
     .test-section {
-        padding: 10px;
+        padding: 15px;
         width: 100%;
         max-width: 100%;
         box-sizing: border-box;
+        margin: 0;
     }
 
     .questions-list {
@@ -572,5 +712,83 @@ materials-grid {
         margin: 10px;
         padding: 15px;
         width: calc(100% - 20px);
+    }
+
+    .tests-grid {
+        flex-direction: column;
+        padding: 0;
+        flex-wrap: wrap;
+        overflow-x: hidden;
+        gap: 15px;
+        padding: 10px 0;
+        margin: 0;
+    }
+
+    .test-card {
+        flex: none;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 15px;
+        height: auto;
+        box-sizing: border-box;
+    }
+    
+    .test-meta {
+        gap: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .test-date {
+        margin-left: 0; /* Убираем отступ слева на мобильных */
+        width: 100%; /* Растягиваем на всю ширину */
+        justify-content: flex-start; /* Выравниваем по левому краю */
+        width: 100%;
+        margin: 5px 0 0 0;
+        order: 3;
+        font-size: 12px;
+    }
+
+    .test-meta span {
+        font-size: 13px;
+        flex: 1;
+        min-width: calc(50% - 5px);
+        justify-content: flex-start;
+    }
+
+    .test-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    .test-description {
+        font-size: 14px;
+        margin-bottom: 12px;
+    }
+
+    .start-test-btn {
+        padding: 12px;
+        margin-top: 10px;
+    }
+
+    .test-section h2 {
+        font-size: 20px;
+        margin-bottom: 15px;
+        padding: 10px 0;
+    }
+
+    /* Улучшаем отображение текста на маленьких экранах */
+    .test-card * {
+        word-break: break-word;
+    }
+
+    /* Оптимизируем отступы для маленьких экранов */
+    .main-content {
+        padding: 0;
+    }
+
+    .content {
+        padding: 10px;
     }
 }

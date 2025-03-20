@@ -261,9 +261,12 @@ app.delete('/api/users/:id', checkAdmin, async (req, res) => {
 
 app.put('/api/users/:id', checkAdmin, async (req, res) => {
     try {
+        // Удаляем возможность обновления username
+        const { username, ...updateData } = req.body;
+        
         const updatedUser = await User.findByIdAndUpdate(
             req.params.id,
-            { $set: req.body },
+            { $set: updateData },
             { new: true, select: '-password' }
         );
         if (!updatedUser) {
@@ -512,7 +515,8 @@ app.post('/api/tests', checkAdmin, async (req, res) => {
             description: description || '',
             questions: [],
             isActive: true,
-            createdAt: new Date()
+            createdAt: new Date(),
+            createdBy: req.session.userId // Добавляем ID создателя
         };
 
         console.log('Создаем новый тест:', newTest);

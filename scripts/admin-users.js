@@ -106,9 +106,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			return str.toLowerCase().split('').map(char => ru[char] || char).join('');
 		};
 
-		const firstPart = transliterate(firstName).substring(0, 1);
-		const secondPart = transliterate(lastName);
-		return (firstPart + secondPart).toLowerCase();
+		const translitFirstName = transliterate(firstName);
+		const translitLastName = transliterate(lastName);
+		
+		// Добавляем случайное число от 100 до 999
+		const randomNum = Math.floor(Math.random() * 900 + 100);
+		return translitFirstName.charAt(0) + translitLastName + randomNum;
 	}
 
 	function generatePassword() {
@@ -233,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function addUserToMobileList(user) {
 		const userRow = document.createElement('div');
 		userRow.classList.add('user-row');
-		userRow.dataset.userId = user._id; // Добавляем data-атрибут с ID пользователя
+		userRow.dataset.userId = user._id;
 	
 		const userHeader = document.createElement('div');
 		userHeader.classList.add('user-header');
@@ -250,11 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			<div class="full-name">${user.lastName} ${user.firstName} ${user.middleName || ''}</div>
 			<div class="user-role">${user.isAdmin ? 'Администратор' : 'Пользователь'}</div>
 			<div class="action-buttons">
-				<button class="edit-btn" data-user-id="${user._id}">
-					<i class="fas fa-edit"></i> Редактировать
+				<button class="icon-btn edit-btn" data-user-id="${user._id}">
+					<i class="fas fa-edit"></i> <span>Редактировать</span>
 				</button>
-				<button class="delete-btn" onclick="deleteUser('${user._id}')">
-					<i class="fas fa-trash"></i> Удалить
+				<button class="icon-btn reset-btn" onclick="resetPassword('${user._id}')">
+					<i class="fas fa-key"></i> <span>Сменить пароль</span>
+				</button>
+				<button class="icon-btn delete-btn" onclick="deleteUser('${user._id}')">
+					<i class="fas fa-trash"></i> <span>Удалить</span>
 				</button>
 			</div>
 		`;
@@ -289,7 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			.then(user => {
 				// Заполняем форму данными пользователя
 				form.elements.userId.value = user._id;
-				form.elements.username.value = user.username || '';
 				form.elements.firstName.value = user.firstName || '';
 				form.elements.lastName.value = user.lastName || '';
 				form.elements.middleName.value = user.middleName || '';
@@ -315,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const userId = form.elements.userId.value;
 		
 		const userData = {
-			username: form.elements.username.value,
+			// Удаляем username из формы редактирования
 			firstName: form.elements.firstName.value,
 			lastName: form.elements.lastName.value,
 			middleName: form.elements.middleName.value,

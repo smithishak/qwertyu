@@ -42,8 +42,8 @@ document.addEventListener('DOMContentLoaded', function() {
                                 ${test.questions ? test.questions.length : 0} вопросов
                             </span>
                             <span>
-                                <i class="fas fa-clock"></i>
-                                ${new Date(test.createdAt || Date.now()).toLocaleDateString()}
+                                <i class="fas fa-calendar-alt"></i>
+                                ${new Date(test.createdAt).toLocaleDateString()}
                             </span>
                         </div>
                         <div class="test-actions">
@@ -87,7 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(testData)
+                body: JSON.stringify(testData),
+                credentials: 'include' // Добавляем для передачи сессионных cookie
             });
 
             const data = await response.json();
@@ -103,7 +104,11 @@ document.addEventListener('DOMContentLoaded', function() {
             await loadTests();
         } catch (error) {
             console.error('Ошибка:', error);
-            alert('Произошла ошибка при сохранении теста: ' + error.message);
+            if (error.message === 'Access denied') {
+                alert('Отказано в доступе. Убедитесь, что вы вошли как администратор.');
+            } else {
+                alert('Произошла ошибка при сохранении теста: ' + error.message);
+            }
         }
     });
 

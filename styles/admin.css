@@ -1778,7 +1778,7 @@ select {
 
 /* Стили для модального окна */
 .modal {
-    display: none;
+    display: none; /* Начальное состояние - скрыто */
     position: fixed;
     top: 0;
     left: 0;
@@ -1787,13 +1787,19 @@ select {
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     overflow-y: auto;
-    padding: 20px;
+    padding: 0;
     box-sizing: border-box;
+}
+
+.modal.show { /* Добавляем класс для отображения */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-content {
     background-color: white;
-    margin: 20px auto;
+    margin: 0 auto;
     padding: 25px;
     border-radius: 12px;
     width: 90%;
@@ -1872,6 +1878,7 @@ select {
     justify-content: center;
     transition: all 0.3s ease;
     width: 50%;
+    min-height: 48px; /* Увеличиваем минимальную высоту */
 }
 
 .save-btn {
@@ -1901,6 +1908,7 @@ select {
     .cancel-btn {
         width: 100%;
         padding: 14px 20px;
+        min-height: 52px; /* Немного увеличиваем высоту на мобильных */
     }
 }
 
@@ -2351,6 +2359,9 @@ select {
     overflow-y: auto;
     padding: 20px;
     box-sizing: border-box;
+    display: flex; /* Добавляем flex */
+    align-items: center; /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
 }
 
 .modal-content {
@@ -2635,6 +2646,297 @@ select {
     background: linear-gradient(135deg, transparent 50%, rgba(52, 152, 219, 0.1));
     border-radius: 0 16px 0 50%;
 }
+
+.icon-btn {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    transition: all 0.3s ease;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.icon-btn i {
+    width: 20px;
+    text-align: center;
+}
+
+.icon-btn.edit-btn {
+    background-color: #3498db;
+}
+
+.icon-btn.reset-btn {
+    background-color: #f39c12;
+}
+
+.icon-btn.delete-btn {
+    background-color: #e74c3c;
+}
+
+.icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ...existing code... */
+
+/* Исправляем стили модального окна */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; /* Добавляем right:0 для полного растяжения */
+    bottom: 0; /* Добавляем bottom:0 для полного растяжения */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none; /* Только одно свойство display */
+}
+
+.modal.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ...existing code... */
+
+@media screen and (max-width: 768px) {
+    .action-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px 0;
+        width: 100%;
+    }
+
+    .icon-btn {
+        width: 100%;
+        min-height: 48px;
+        padding: 10px 16px;
+        justify-content: center; /* Меняем на center */
+        border-radius: 6px;
+    }
+
+    .icon-btn i {
+        width: auto; /* Убираем фиксированную ширину */
+        margin-right: 8px;
+    }
+
+    /* Удаляем псевдоэлемент :after для кнопок */
+    .icon-btn:after {
+        display: none;
+    }
+
+    /* Центрируем текст в кнопках */
+    .icon-btn span {
+        flex: 0 1 auto; /* Меняем flex для центрирования */
+        text-align: center;
+    }
+}
+
+/* ...existing code... */
+
+/* ...existing code... */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 500px; /* Уменьшаем максимальную ширину */
+    max-height: 90vh; /* Максимальная высота 90% от высоты экрана */
+    overflow-y: auto; /* Добавляем прокрутку */
+    margin: auto;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для скроллбара в модальном окне */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Адаптивные стили для модального окна */
+@media screen and (max-width: 768px) {
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 15px;
+        margin: 10px auto;
+    }
+}
+
+/* ...existing code... */
+
+/* ...existing code... */
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; /* Добавляем right:0 для полного растяжения */
+    bottom: 0; /* Добавляем bottom:0 для полного растяжения */
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none; /* Только одно свойство display */
+}
+
+.modal.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 450px; /* Уменьшаем максимальную ширину */
+    max-height: 80vh; /* Уменьшаем максимальную высоту */
+    overflow-y: auto;
+    margin: 0 auto; /* Явно задаем margin auto */
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2%); /* Небольшой сдвиг вверх для визуального баланса */
+}
+
+/* Обновляем стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .modal {
+        padding: 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-width: 400px; /* Ещё меньше на мобильных */
+        padding: 15px;
+        margin: 15 auto;
+    }
+}
+
+/* ...existing code... */
+
+/* ...existing code... */
+
+/* Заменяем все предыдущие стили модального окна на эти */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.modal.active {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    width: 90%;
+    max-width: 450px;
+    max-height: 80vh;
+    overflow-y: auto;
+    margin: 0 auto;
+    padding: 20px;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Стили для скроллбара */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 90%;
+        max-width: 450px;
+        padding: 15px;
+        margin-top: 20px;
+    }
+}
+
+/* ...existing code... */
 
 
 
