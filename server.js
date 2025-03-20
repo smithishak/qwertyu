@@ -45,17 +45,59 @@ const upload = multer({ storage });
 // Middleware для обработки JSON данных и статических файлов
 app.use(express.json());
 
+// Add session middleware
+const session = require('express-session');
+app.use(session({
+    secret: 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Add new middleware for authentication check
+const checkAuth = async (req, res, next) => {
+    // Allow access to login page and auth endpoints
+    const publicPaths = [
+        '/login.html',
+        '/pages/login.html',
+        '/auth',
+        '/styles/login.css',
+        '/scripts/login.js'
+    ];
+
+    // Allow static assets for login page
+    if (publicPaths.includes(req.path) || 
+        req.path.startsWith('/styles/') || 
+        req.path.startsWith('/scripts/')) {
+        return next();
+    }
+
+    // Check if user is logged in (you'll need to implement session management)
+    if (!req.session?.authenticated) {
+        // If accessing HTML page, redirect to login
+        if (req.path.endsWith('.html') || req.path === '/') {
+            return res.redirect('/login.html');
+        }
+        // If accessing API, return unauthorized
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    next();
+};
+
+// Apply authentication middleware
+app.use(checkAuth);
+
 // Обновляем middleware проверки админа
 const checkAdmin = async (req, res, next) => {
-    try {
-        const user = await User.findOne({ username: 'admin' });
-        if (!user || !user.isAdmin) {
-            return res.status(403).json({ error: 'Access denied' });
-        }
-        next();
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
+    if (!req.session?.isAdmin) {
+        return res.status(403).json({ error: 'Access denied' });
     }
+    next();
 };
 
 // Маршрут для авторизации
@@ -70,6 +112,11 @@ app.post('/auth', async (req, res) => {
                 message: 'Неверный логин или пароль' 
             });
         }
+        
+        // Set session data
+        req.session.authenticated = true;
+        req.session.userId = user._id;
+        req.session.isAdmin = user.isAdmin;
         
         // Обновляем время последнего входа
         await User.findByIdAndUpdate(user._id, {
@@ -88,6 +135,16 @@ app.post('/auth', async (req, res) => {
             message: 'Ошибка сервера' 
         });
     }
+});
+
+// Add logout endpoint
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            return res.status(500).json({ error: 'Ошибка при выходе' });
+        }
+        res.json({ success: true });
+    });
 });
 
 // Protected admin routes
@@ -136,21 +193,55 @@ app.get('/api/users', checkAdmin, async (req, res) => {
 app.post('/api/users', checkAdmin, async (req, res) => {
     try {
         const userData = req.body;
-        const newUser = new User(userData);
+        
+        // Validate required fields
+        if (!userData.username || !userData.password || !userData.firstName || !userData.lastName) {
+            return res.status(400).json({ 
+                error: 'Не все обязательные поля заполнены'
+            });
+        }
+
+        // Create user instance
+        const newUser = new User({
+            username: userData.username,
+            password: userData.password,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            middleName: userData.middleName || '',
+            email: userData.email || '',
+            isAdmin: !!userData.isAdmin,
+            createdAt: new Date(),
+            lastLoginDate: null
+        });
+
+        // Save user to database
         await newUser.save();
+
+        // Send response with user data (excluding password)
         res.status(201).json({
             success: true,
             user: {
-                ...userData,
-                password: undefined // Не отправляем пароль обратно
+                _id: newUser._id,
+                username: newUser.username,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                middleName: newUser.middleName,
+                email: newUser.email,
+                isAdmin: newUser.isAdmin,
+                createdAt: newUser.createdAt
             }
         });
     } catch (error) {
         console.error('Ошибка создания пользователя:', error);
-        if (error.code === 11000) { // Ошибка дубликата
-            res.status(400).json({ error: 'Пользователь с таким логином уже существует' });
+        if (error.code === 11000) { // MongoDB duplicate key error
+            res.status(400).json({ 
+                error: 'Пользователь с таким логином уже существует' 
+            });
         } else {
-            res.status(500).json({ error: 'Ошибка сервера' });
+            res.status(500).json({ 
+                error: 'Ошибка сервера',
+                details: error.message 
+            });
         }
     }
 });

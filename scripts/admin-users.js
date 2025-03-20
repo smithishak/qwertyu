@@ -93,25 +93,58 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	};
 
+	// Add helper functions for generating user data
+	function generateUsername(firstName, lastName) {
+		const transliterate = str => {
+			const ru = {
+				'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'e',
+				'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+				'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+				'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ъ': '',
+				'ы': 'y', 'ь': '', 'э': 'e', 'ю': 'yu', 'я': 'ya'
+			};
+			return str.toLowerCase().split('').map(char => ru[char] || char).join('');
+		};
+
+		const firstPart = transliterate(firstName).substring(0, 1);
+		const secondPart = transliterate(lastName);
+		return (firstPart + secondPart).toLowerCase();
+	}
+
+	function generatePassword() {
+		const length = 8;
+		const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		return Array.from(crypto.getRandomValues(new Uint32Array(length)))
+			.map(x => charset[x % charset.length])
+			.join('');
+	}
+
 	// Модифицируем обработчик добавления пользователя
 	addUserForm.addEventListener('submit', async (e) => {
 		e.preventDefault();
-		const password = generatePassword();
 		
-		const userData = {
-			username: addUserForm.username.value,
-			password: password,
-			firstName: addUserForm.firstName.value,
-			lastName: addUserForm.lastName.value,
-			middleName: addUserForm.middleName.value,
-			phoneNumber: addUserForm.phoneNumber.value,
-			email: addUserForm.email.value,
-			passportNumber: addUserForm.passportNumber.value,
-			snilsNumber: addUserForm.snilsNumber.value,
-			isAdmin: addUserForm.isAdmin.checked
-		};
-
 		try {
+			const formData = new FormData(e.target);
+			const firstName = formData.get('firstName')?.trim();
+			const lastName = formData.get('lastName')?.trim();
+
+			if (!firstName || !lastName) {
+				throw new Error('Имя и фамилия обязательны для заполнения');
+			}
+
+			const userData = {
+				firstName,
+				lastName,
+				middleName: formData.get('middleName')?.trim() || '',
+				email: formData.get('email')?.trim() || '',
+				phoneNumber: '', // Add default phone number
+				isAdmin: formData.get('isAdmin') === 'on',
+				username: generateUsername(firstName, lastName),
+				password: generatePassword()
+			};
+
+			console.log('Sending user data:', userData); // Debug log
+
 			const response = await fetch('/api/users', {
 				method: 'POST',
 				headers: {
@@ -120,18 +153,23 @@ document.addEventListener('DOMContentLoaded', () => {
 				body: JSON.stringify(userData)
 			});
 
-			const result = await response.json();
-			if (response.ok) {
-				userPasswords.set(result.user._id, password);
-				alert(`Пользователь создан успешно!\nЛогин: ${userData.username}\nПароль: ${password}`);
-				addUserForm.reset();
-				loadUsers();
-			} else {
-				alert('Ошибка при создании пользователя');
+			if (!response.ok) {
+				const errorData = await response.json();
+				throw new Error(errorData.error || 'Ошибка при создании пользователя');
 			}
+
+			const data = await response.json();
+
+			// Store the password temporarily
+			userPasswords.set(data.user._id, userData.password);
+
+			alert(`Пользователь успешно создан!\nЛогин: ${userData.username}\nПароль: ${userData.password}`);
+			e.target.reset();
+			await loadUsers();
+
 		} catch (error) {
-			console.error('Ошибка:', error);
-			alert('Ошибка при создании пользователя');
+			console.error('Ошибка создания пользователя:', error);
+			alert(error.message);
 		}
 	});
 

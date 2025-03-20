@@ -20,15 +20,16 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     middleName: {
-        type: String
+        type: String,
+        default: ''
     },
     phoneNumber: {
         type: String,
-        required: true
+        default: '' // Change to optional with empty default
     },
     email: {
         type: String,
-        required: true
+        default: ''
     },
     isAdmin: {
         type: Boolean,
