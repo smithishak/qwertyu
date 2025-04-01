@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <h3 class="test-title">${test.title}</h3>
                     <p class="test-description">${test.description || ''}</p>
                     <div class="test-meta">
-                        <span><i class="fas fa-question-circle"></i> ${test.questions.length} вопросов</span>
+                        <span><i class="fas fa-question-circle"></i>Вопросов: ${test.questions.length} </span>
                         <span class="test-date">
                             <i class="fas fa-calendar-alt"></i> 
                             Создан: ${new Date(test.createdAt).toLocaleDateString()}

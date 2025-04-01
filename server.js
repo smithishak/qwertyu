@@ -15,8 +15,27 @@ mongoose.connect('mongodb://localhost:27017/web-app-db', {
     useNewUrlParser: true, 
     useUnifiedTopology: true 
 })
-.then(() => console.log('MongoDB подключен успешно'))
-.catch(err => console.error('Ошибка подключения к MongoDB:', err));
+.then(() => {
+    console.log('MongoDB подключен успешно');
+    // Запускаем сервер только после успешного подключения к БД
+    app.listen(3000, () => {
+        console.log('Сервер запущен на порту 3000');
+    });
+})
+.catch(err => {
+    console.error('Ошибка подключения к MongoDB:', err);
+    process.exit(1); // Завершаем процесс при ошибке подключения
+});
+
+// Добавляем обработку необработанных ошибок
+process.on('unhandledRejection', (error) => {
+    console.error('Необработанная ошибка:', error);
+});
+
+process.on('uncaughtException', (error) => {
+    console.error('Критическая ошибка:', error);
+    process.exit(1);
+});
 
 const db = mongoose.connection;
 let questionsCollection;
@@ -119,38 +138,66 @@ app.use('/api/results', checkAdmin);
 app.post('/auth', async (req, res) => {
     const { login, password } = req.body;
     try {
-        const user = await User.findOne({ username: login });
-        
-        if (!user || user.password !== password) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Неверный логин или пароль' 
+        // Добавляем логирование для отладки
+        console.log('Попытка входа:', { login });
+
+        // Проверяем наличие логина и пароля
+        if (!login || !password) {
+            console.log('Отсутствует логин или пароль');
+            return res.status(400).json({
+                success: false,
+                message: 'Введите логин и пароль'
             });
         }
-        
-        // Set session data
+
+        // Ищем пользователя
+        const user = await User.findOne({ username: login });
+        console.log('Найден пользователь:', user ? 'Да' : 'Нет');
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Неверный логин или пароль'
+            });
+        }
+
+        // Проверяем пароль (в реальном приложении используйте bcrypt)
+        if (user.password !== password) {
+            console.log('Неверный пароль');
+            return res.status(401).json({
+                success: false,
+                message: 'Неверный логин или пароль'
+            });
+        }
+
+        // Создаем сессию
         req.session.authenticated = true;
         req.session.userId = user._id;
         req.session.isAdmin = user.isAdmin;
-        
+
         // Обновляем время последнего входа
-        await User.findByIdAndUpdate(user._id, {
-            lastLoginDate: new Date()
+        await User.findByIdAndUpdate(user._id, { lastLoginDate: new Date() });
+
+        console.log('Успешный вход:', {
+            userId: user._id,
+            username: user.username,
+            isAdmin: user.isAdmin
         });
-        
-        res.json({ 
+
+        res.json({
             success: true,
             username: user.username,
-            isAdmin: user.isAdmin,
             firstName: user.firstName,
             lastName: user.lastName,
-            middleName: user.middleName
+            middleName: user.middleName,
+            isAdmin: user.isAdmin
         });
+
     } catch (error) {
         console.error('Ошибка авторизации:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Ошибка сервера' 
+        res.status(500).json({
+            success: false,
+            message: 'Ошибка сервера'
         });
     }
 });
@@ -200,7 +247,24 @@ app.get('/api/db-status', (req, res) => {
 // API маршруты для пользователей
 app.get('/api/users', checkAdmin, async (req, res) => {
     try {
-        const users = await User.find({}, '-password');
+        const searchQuery = req.query.search || '';
+        let query = {};
+
+        if (searchQuery) {
+            // Создаем регулярное выражение для поиска
+            const searchRegex = new RegExp(searchQuery, 'i');
+            query = {
+                $or: [
+                    { username: searchRegex },
+                    { firstName: searchRegex },
+                    { lastName: searchRegex },
+                    { middleName: searchRegex },
+                    { email: searchRegex }
+                ]
+            };
+        }
+
+        const users = await User.find(query).select('-password');
         res.json(users);
     } catch (error) {
         console.error('Ошибка получения пользователей:', error);
@@ -1227,9 +1291,4 @@ app.get('*.html', (req, res, next) => {
     }
 
     res.redirect('/login.html');
-});
-
-// Запуск сервера
-app.listen(3000, () => {
-    console.log('Сервер запущен на порту 3000');
 });

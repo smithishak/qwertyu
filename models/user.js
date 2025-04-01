@@ -19,30 +19,18 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    middleName: {
-        type: String,
-        default: ''
-    },
-    phoneNumber: {
-        type: String,
-        default: '' // Change to optional with empty default
-    },
-    email: {
-        type: String,
-        default: ''
-    },
+    middleName: String,
+    email: String,
+    phoneNumber: String,
     isAdmin: {
         type: Boolean,
         default: false
     },
-    lastLoginDate: {
-        type: Date,
-        default: null
-    },
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    lastLoginDate: Date
 });
 
 // Экспорт модели

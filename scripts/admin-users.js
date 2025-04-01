@@ -18,41 +18,82 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	// Загрузка списка пользователей
-	async function loadUsers() {
+	async function loadUsers(searchQuery = '') {
 		try {
-			const response = await fetch('/api/users');
+			const response = await fetch(`/api/users${searchQuery ? `?search=${searchQuery}` : ''}`);
+			if (!response.ok) throw new Error('Failed to load users');
 			const users = await response.json();
 			
-			usersList.innerHTML = users.map(user => `
-				<tr>
-					<td>${user.username}</td>
-					<td>${user.lastName} ${user.firstName} ${user.middleName || ''}</td>
-					<td>
-						${userPasswords.get(user._id) || 'Пароль скрыт'}
-						${userPasswords.get(user._id) ? 
-							`<button onclick="copyPassword('${user._id}')" class="copy-btn">
-								<i class="fas fa-copy"></i>
-							</button>` : ''}
-					</td>
-					<td>
-							<button onclick="editUser('${user._id}')" class="edit-btn">
-								<i class="fas fa-edit"></i>
-							</button>
-							<button onclick="deleteUser('${user._id}')" class="delete-btn">
-								<i class="fas fa-trash"></i>
-							</button>
-							<button onclick="resetPassword('${user._id}')" class="reset-btn">
-								<i class="fas fa-key"></i>
-							</button>
-					</td>
-				</tr>
-			`).join('');
+			const tbody = document.getElementById('usersList');
+			const mobileList = document.getElementById('usersListMobile');
+			
+			if (!tbody || !mobileList) {
+				console.error('Required DOM elements not found');
+				return;
+			}
 
-			// Добавляем пользователей в мобильный список
-			usersListMobile.innerHTML = '';
-			users.forEach(user => addUserToMobileList(user));
+			tbody.innerHTML = '';
+			mobileList.innerHTML = '';
+			
+			users.forEach((user, index) => {
+				const fullName = `${user.lastName} ${user.firstName} ${user.middleName || ''}`.trim();
+				
+				// Desktop view
+				const tr = document.createElement('tr');
+				tr.innerHTML = `
+					<td>${fullName}</td>
+					<td>${user.email || '-'}</td>
+					<td>${user.isAdmin ? 'Администратор' : 'Пользователь'}</td>
+					<td>
+						<div class="action-buttons">
+							<button class="edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button>
+							<button class="delete-btn" title="Удалить"><i class="fas fa-trash"></i></button>
+							<button class="reset-btn" title="Сбросить пароль"><i class="fas fa-key"></i></button>
+						</div>
+					</td>
+				`;
+				tbody.appendChild(tr);
+				attachActionHandlers(tr, user);
+
+				// Mobile view
+				const userRow = document.createElement('div');
+				userRow.classList.add('user-row');
+				userRow.innerHTML = `
+					<div class="user-header">
+						<div class="user-summary">
+							<span class="user-number">${index + 1}</span>
+							<span class="user-preview">${fullName}</span>
+							<i class="fas fa-chevron-down"></i>
+						</div>
+					</div>
+					<div class="user-details">
+						<div class="full-name">${fullName}</div>
+						<div class="user-email">${user.email || '-'}</div>
+						<div class="user-role">${user.isAdmin ? 'Администратор' : 'Пользователь'}</div>
+						<div class="action-buttons">
+							<button class="icon-btn edit-btn" data-user-id="${user._id}">
+								<i class="fas fa-edit"></i> <span>Редактировать</span>
+							</button>
+							<button class="icon-btn reset-btn" onclick="resetPassword('${user._id}')">
+								<i class="fas fa-key"></i> <span>Сбросить пароль</span>
+							</button>
+							<button class="icon-btn delete-btn" onclick="deleteUser('${user._id}')">
+								<i class="fas fa-trash"></i> <span>Удалить</span>
+							</button>
+						</div>
+					</div>
+				`;
+				mobileList.appendChild(userRow);
+
+				// Add toggle handler for mobile view
+				const header = userRow.querySelector('.user-header');
+				header.addEventListener('click', () => {
+					userRow.classList.toggle('expanded');
+				});
+			});
 		} catch (error) {
-			console.error('Ошибка загрузки пользователей:', error);
+			console.error('Error:', error);
+			alert('Ошибка при загрузке пользователей');
 		}
 	}
 
@@ -198,39 +239,43 @@ document.addEventListener('DOMContentLoaded', () => {
 	};
 
 	// Функция редактирования пользователя
-	window.editUser = async (userId) => {
+	async function editUser(user) {
 		try {
-			const response = await fetch(`/api/users/${userId}`);
-			const user = await response.json();
-			
-			const newData = {
-				firstName: prompt('Имя:', user.firstName),
-				lastName: prompt('Фамилия:', user.lastName),
-				middleName: prompt('Отчество:', user.middleName || ''),
-				isAdmin: confirm('Сделать администратором?')
-			};
-
-			if (newData.firstName && newData.lastName) {
-				const updateResponse = await fetch(`/api/users/${userId}`, {
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json'
-					},
-					body: JSON.stringify(newData)
-				});
-
-				if (updateResponse.ok) {
-					alert('Данные пользователя обновлены');
-					loadUsers(); // Перезагружаем список
-				} else {
-					alert('Ошибка при обновлении пользователя');
-				}
+			const modal = document.getElementById('editUserModal');
+			if (!modal) {
+				throw new Error('Modal element not found');
 			}
+
+			const response = await fetch(`/api/users/${user._id}`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch user data');
+			}
+
+			const userData = await response.json();
+			console.log('User data fetched:', userData);
+
+			// Fill form fields
+			const form = document.getElementById('editUserForm');
+			form.elements.userId.value = userData._id;
+			form.elements.firstName.value = userData.firstName || '';
+			form.elements.lastName.value = userData.lastName || '';
+			form.elements.middleName.value = userData.middleName || '';
+			form.elements.phoneNumber.value = userData.phoneNumber || '';
+			form.elements.email.value = userData.email || '';
+			form.elements.isAdmin.checked = userData.isAdmin || false;
+
+			// Show modal
+			modal.classList.add('active');
 		} catch (error) {
-			console.error('Ошибка:', error);
-			alert('Ошибка при редактировании пользователя');
+			console.error('Error editing user:', error);
+			alert('Ошибка при редактировании пользователя: ' + error.message);
 		}
-	};
+	}
+
+	function closeEditModal() {
+		const modal = document.getElementById('editUserModal');
+		modal.classList.remove('active');
+	}
 
 	// Обновляем функцию добавления пользователя в мобильный список
 	function addUserToMobileList(user) {
@@ -308,11 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			});
 	}
 
-	function closeEditModal() {
-		const modal = document.getElementById('editUserModal');
-		modal.style.display = 'none';
-	}
-
 	// Обработчик отправки формы редактирования
 	document.getElementById('editUserForm').addEventListener('submit', async (e) => {
 		e.preventDefault();
@@ -320,10 +360,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const userId = form.elements.userId.value;
 		
 		const userData = {
-			// Удаляем username из формы редактирования
 			firstName: form.elements.firstName.value,
 			lastName: form.elements.lastName.value,
 			middleName: form.elements.middleName.value,
+			phoneNumber: form.elements.phoneNumber.value,
+			email: form.elements.email.value,
 			isAdmin: form.elements.isAdmin.checked
 		};
 
@@ -338,14 +379,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			if (response.ok) {
 				closeEditModal();
-				loadUsers(); // Перезагружаем список пользователей
+				loadUsers();
 				alert('Пользователь успешно обновлен');
 			} else {
 				const data = await response.json();
 				alert(data.error || 'Ошибка при обновлении пользователя');
 			}
 		} catch (error) {
-			console.error('Ошибка:', error);
+			console.error('Error:', error);
 			alert('Ошибка при обновлении пользователя');
 		}
 	});
@@ -373,6 +414,28 @@ document.addEventListener('DOMContentLoaded', () => {
 	document.getElementById('cancelEditBtn').addEventListener('click', () => {
 		closeEditModal();
 	});
+
+	// Update attachActionHandlers function
+	function attachActionHandlers(tr, user) {
+		if (!tr || !user) {
+			console.error('Invalid parameters for attachActionHandlers');
+			return;
+		}
+
+		const editBtn = tr.querySelector('.edit-btn');
+		const deleteBtn = tr.querySelector('.delete-btn');
+		const resetBtn = tr.querySelector('.reset-btn');
+
+		if (editBtn) {
+			editBtn.addEventListener('click', () => editUser(user));
+		}
+		if (deleteBtn) {
+			deleteBtn.addEventListener('click', () => deleteUser(user._id));
+		}
+		if (resetBtn) {
+			resetBtn.addEventListener('click', () => resetPassword(user._id));
+		}
+	}
 
 	// Инициализация
 	loadUsers();

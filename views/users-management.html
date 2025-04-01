@@ -7,6 +7,32 @@
     <link rel="stylesheet" href="../styles/admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>👥 Управление пользователями</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -70,31 +96,26 @@
                     </div>
                     <div class="users-list-block">
                         <h2><i class="fas fa-users"></i> Список пользователей</h2>
+                        <div class="search-container">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="searchUser" placeholder="Поиск по имени, логину или email..." class="search-input">
+                            <button class="clear-search" id="clearSearch">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
                         <div class="table-container">
                             <table class="users-table">
                                 <thead>
                                     <tr>
                                         <th>Логин</th>
                                         <th>ФИО</th>
+                                        <th>Email</th>
                                         <th>Роль</th>
                                         <th>Действия</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersList">
                                     <!-- Сюда будут добавляться пользователи -->
-                                    <tr>
-                                        <td>username</td>
-                                        <td>ФИО</td>
-                                        <td>Роль</td>
-                                        <td>
-                                            <div class="action-buttons">
-                                                <button class="edit-btn"><i class="fas fa-edit"></i></button>
-                                                <button class="delete-btn"><i class="fas fa-trash"></i></button>
-                                                <button class="copy-btn"><i class="fas fa-copy"></i></button>
-                                                <button class="reset-btn"><i class="fas fa-key"></i></button>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -112,10 +133,6 @@
             <form id="editUserForm" class="edit-user-form">
                 <input type="hidden" name="userId">
                 <div class="form-group">
-                    <label><i class="fas fa-user"></i> Логин:</label>
-                    <input type="text" name="username" required>
-                </div>
-                <div class="form-group">
                     <label><i class="fas fa-user-tag"></i> Фамилия:</label>
                     <input type="text" name="lastName" required>
                 </div>
@@ -126,6 +143,14 @@
                 <div class="form-group">
                     <label><i class="fas fa-user-tag"></i> Отчество:</label>
                     <input type="text" name="middleName">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> Номер телефона:</label>
+                    <input type="text" name="phoneNumber" placeholder="Введите номер телефона">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Адрес электронной почты:</label>
+                    <input type="email" name="email" placeholder="Введите адрес электронной почты">
                 </div>
                 <div class="form-group admin-checkbox">
                     <input type="checkbox" name="isAdmin" id="editIsAdmin">
@@ -141,5 +166,260 @@
     <script src="/scripts/user-info.js"></script>
     <script src="../scripts/menu.js"></script>
     <script src="../scripts/admin-users.js"></script>
+    <script>
+        const searchInput = document.getElementById('searchUser');
+        let searchTimeout;
+
+        // Обновляем стили для кнопок действий
+        const actionButtonStyles = `
+            .action-buttons {
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+            }
+            .action-buttons button {
+                padding: 6px 12px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+            }
+            .action-buttons .edit-btn { background-color: #3498db; }
+            .action-buttons .delete-btn { background-color: #e74c3c; }
+            .action-buttons .copy-btn { background-color: #2ecc71; }
+            .action-buttons .reset-btn { background-color: #f1c40f; }
+            .action-buttons button:hover { transform: translateY(-2px); }
+        `;
+
+        // Добавляем стили в head
+        if (!document.querySelector('#action-buttons-style')) {
+            const styleSheet = document.createElement('style');
+            styleSheet.id = 'action-buttons-style';
+            styleSheet.textContent = actionButtonStyles;
+            document.head.appendChild(styleSheet);
+        }
+
+        // Функция для добавления обработчиков событий кнопкам
+        function attachActionHandlers(tr, user) {
+            const editBtn = tr.querySelector('.edit-btn');
+            const deleteBtn = tr.querySelector('.delete-btn');
+            const resetBtn = tr.querySelector('.reset-btn');
+
+            if (editBtn) {
+                editBtn.addEventListener('click', () => editUser(user));
+            }
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => deleteUser(user._id));
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => resetPassword(user._id));
+            }
+        }
+
+        // Функция редактирования пользователя
+        async function editUser(user) {
+            try {
+                const modal = document.getElementById('editUserModal');
+                const form = document.getElementById('editUserForm');
+                
+                if (!modal || !form) {
+                    throw new Error('Modal elements not found');
+                }
+
+                // Fill form fields
+                form.elements.userId.value = user._id;
+                form.elements.firstName.value = user.firstName || '';
+                form.elements.lastName.value = user.lastName || '';
+                form.elements.middleName.value = user.middleName || '';
+                form.elements.phoneNumber.value = user.phoneNumber || '';
+                form.elements.email.value = user.email || '';
+                form.elements.isAdmin.checked = user.isAdmin || false;
+                
+                // Show modal using CSS
+                modal.style.display = 'flex';
+                modal.classList.add('active');
+            } catch (error) {
+                console.error('Error showing edit modal:', error);
+                alert('Ошибка при открытии формы редактирования');
+            }
+        }
+
+        // Update preview info display
+        function userPreview(user) {
+            return `${user.lastName || ''} ${user.firstName || ''} ${user.middleName || ''}`.trim();
+        }
+
+        // Update preview in desktop table
+        async function loadUsers(searchQuery = '') {
+            try {
+                const response = await fetch(`/api/users${searchQuery ? `?search=${searchQuery}` : ''}`);
+                if (!response.ok) throw new Error('Failed to load users');
+                const users = await response.json();
+                
+                const tbody = document.getElementById('usersList');
+                const mobileList = document.getElementById('usersListMobile');
+                
+                if (!tbody || !mobileList) {
+                    console.error('Required DOM elements not found');
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                mobileList.innerHTML = '';
+                
+                users.forEach((user, index) => {
+                    const fullName = `${user.lastName} ${user.firstName} ${user.middleName || ''}`.trim();
+                    
+                    // Desktop view
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${fullName}</td>
+                        <td>${user.email || '-'}</td>
+                        <td>${user.isAdmin ? 'Администратор' : 'Пользователь'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="edit-btn" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                <button class="delete-btn" title="Удалить"><i class="fas fa-trash"></i></button>
+                                <button class="reset-btn" title="Сбросить пароль"><i class="fas fa-key"></i></button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    attachActionHandlers(tr, user);
+
+                    // Mobile view
+                    const userRow = document.createElement('div');
+                    userRow.classList.add('user-row');
+                    userRow.innerHTML = `
+                        <div class="user-header">
+                            <div class="user-summary">
+                                <span class="user-number">${index + 1}</span>
+                                <span class="user-preview">${fullName}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-info-details">
+                                <p><strong>Логин:</strong> ${user.username}</p>
+                                <p><strong>ФИО:</strong> ${fullName}</p>
+                                <p><strong>Email:</strong> ${user.email || '-'}</p>
+                                <p><strong>Роль:</strong> ${user.isAdmin ? 'Администратор' : 'Пользователь'}</p>
+                            </div>
+                            <div class="action-buttons">
+                                <button class="icon-btn edit-btn" data-user-id="${user._id}">
+                                    <i class="fas fa-edit"></i> <span>Редактировать</span>
+                                </button>
+                                <button class="icon-btn reset-btn" onclick="resetPassword('${user._id}')">
+                                    <i class="fas fa-key"></i> <span>Сбросить пароль</span>
+                                </button>
+                                <button class="icon-btn delete-btn" onclick="deleteUser('${user._id}')">
+                                    <i class="fas fa-trash"></i> <span>Удалить</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    mobileList.appendChild(userRow);
+
+                    // Add toggle handler for mobile view
+                    const header = userRow.querySelector('.user-header');
+                    header.addEventListener('click', () => {
+                        userRow.classList.toggle('expanded');
+                    });
+                });
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Ошибка при загрузке пользователей');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+                try {
+                    const response = await fetch(`/api/users/${userId}`, {
+                        method: 'DELETE'
+                    });
+                    if (!response.ok) throw new Error('Ошибка при удалении');
+                    loadUsers();
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ошибка при удалении пользователя');
+                }
+            }
+        }
+
+        async function resetPassword(userId) {
+            if (confirm('Вы уверены, что хотите сбросить пароль этого пользователя?')) {
+                try {
+                    const response = await fetch(`/api/users/${userId}/reset-password`, {
+                        method: 'POST'
+                    });
+                    if (!response.ok) throw new Error('Ошибка при сбросе пароля');
+                    const data = await response.json();
+                    alert(`Новый пароль: ${data.newPassword}`);
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ошибка при сбросе пароля');
+                }
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('editUserModal');
+            modal.style.display = 'none';
+            modal.classList.remove('active');
+        }
+
+        document.getElementById('cancelEditBtn').addEventListener('click', closeModal);
+        
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('editUserModal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+        });
+
+        // Добавляем обработчик для кнопки очистки
+        document.getElementById('clearSearch').addEventListener('click', () => {
+            searchInput.value = '';
+            loadUsers();
+            document.querySelector('.search-container').classList.remove('has-text');
+        });
+
+        // Добавляем обработчик поиска с debounce
+        searchInput.addEventListener('input', function() {
+            // Показываем/скрываем кнопку очистки
+            const container = document.querySelector('.search-container');
+            if (this.value) {
+                container.classList.add('has-text');
+            } else {
+                container.classList.remove('has-text');
+            }
+
+            // Отменяем предыдущий таймер
+            clearTimeout(searchTimeout);
+
+            // Устанавливаем новый таймер для поиска
+            searchTimeout = setTimeout(() => {
+                loadUsers(this.value);
+            }, 300); // Задержка 300ms
+        });
+
+        // Обновляем обработчик формы добавления пользователя
+        document.getElementById('addUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // ... существующий код обработки формы ...
+            // После успешного добавления:
+            await loadUsers(); // Перезагружаем список пользователей
+        });
+    </script>
 </body>
 </html>

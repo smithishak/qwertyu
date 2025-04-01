@@ -20,18 +20,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // Функция авторизации
     async function login(login, password) {
         try {
+            console.log('Sending login request for:', login);
+
+            // Добавляем таймаут для запроса
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 секунд таймаут
+
             const response = await fetch('/auth', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ login, password }),
+                credentials: 'same-origin',
+                signal: controller.signal
             });
 
+            clearTimeout(timeoutId);
+
             const data = await response.json();
-            
+            console.log('Server response:', { 
+                status: response.status, 
+                success: data.success 
+            });
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Ошибка авторизации');
+            }
+
             if (data.success) {
-                // Сохраняем данные пользователя с полным ФИО
                 localStorage.setItem('userInfo', JSON.stringify({
                     firstName: data.firstName || '',
                     lastName: data.lastName || '',
@@ -39,15 +56,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     isAdmin: data.isAdmin || false,
                     username: data.username
                 }));
-                
-                // Редирект на главную или админ панель
+
                 window.location.href = data.isAdmin ? '/admin-panel.html' : '/index.html';
             } else {
-                showError(data.message || 'Ошибка авторизации');
+                throw new Error(data.message || 'Ошибка авторизации');
             }
         } catch (error) {
-            console.error('Ошибка:', error);
-            showError('Ошибка сервера');
+            console.error('Login error:', error);
+            if (error.name === 'AbortError') {
+                throw new Error('Сервер не отвечает. Проверьте подключение.');
+            } else if (error.message === 'Failed to fetch') {
+                throw new Error('Не удалось подключиться к серверу. Убедитесь, что сервер запущен.');
+            }
+            throw error;
         }
     }
 
@@ -75,6 +96,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await login(loginValue, passwordValue);
+        } catch (error) {
+            showError(error.message);
         } finally {
             // Возвращаем кнопку в исходное состояние
             submitButton.disabled = false;

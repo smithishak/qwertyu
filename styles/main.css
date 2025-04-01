@@ -767,6 +767,67 @@ header {
     color: #7f8c8d;
 }
 
+/* Стили для поиска пользователей */
+.search-container {
+    position: relative;
+    margin-bottom: 20px;
+    max-width: 500px;
+    width: 100%;
+}
+
+.search-container .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 16px;
+}
+
+.search-container .search-input {
+    width: 100%;
+    padding: 12px 40px 12px 45px;
+    border: 2px solid #e0e0e0;
+    border-radius: 25px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: white;
+}
+
+.search-container .search-input:focus {
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    outline: none;
+}
+
+.search-container .search-input::placeholder {
+    color: #999;
+}
+
+.search-container .clear-search {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+    display: none;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.search-container.has-text .clear-search {
+    display: block;
+}
+
+.search-container .clear-search:hover {
+    opacity: 1;
+}
+
 /* Медиа-запрос для мобильных устройств */
 @media screen and (max-width: 768px) {
     .menu-btn {
@@ -961,5 +1022,15 @@ header {
 
     .content {
         padding: 10px;
+    }
+
+    .search-container {
+        max-width: 100%;
+        margin: 10px 0;
+    }
+
+    .search-container .search-input {
+        padding: 10px 35px 10px 40px;
+        font-size: 14px;
     }
 }
