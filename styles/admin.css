@@ -2687,7 +2687,71 @@ select {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* ...existing code... */
+/* Стили для секции результатов тестов */
+.test-results-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.test-results-section h3 {
+    color: #2c3e50;
+    font-size: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.test-results-section h3 i {
+    color: var(--secondary-color);
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.results-table th,
+.results-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.results-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.results-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Адаптивные стили для мобильных устройств */
+@media screen and (max-width: 768px) {
+    .test-results-section {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .results-table {
+        min-width: 600px; /* Обеспечивает горизонтальную прокрутку на мобильных */
+    }
+
+    .table-wrapper {
+        margin: 0 -15px;
+        padding: 0 15px;
+    }
+}
 
 /* Исправляем стили модального окна */
 .modal {
@@ -2711,8 +2775,6 @@ select {
     align-items: center;
     justify-content: center;
 }
-
-/* ...existing code... */
 
 @media screen and (max-width: 768px) {
     .action-buttons {
@@ -2747,10 +2809,6 @@ select {
         text-align: center;
     }
 }
-
-/* ...existing code... */
-
-/* ...existing code... */
 
 .modal {
     display: none;
@@ -2817,10 +2875,6 @@ select {
     }
 }
 
-/* ...existing code... */
-
-/* ...existing code... */
-
 .modal {
     display: none;
     position: fixed;
@@ -2872,11 +2926,6 @@ select {
     }
 }
 
-/* ...existing code... */
-
-/* ...existing code... */
-
-/* Заменяем все предыдущие стили модального окна на эти */
 .modal {
     display: none;
     position: fixed;
@@ -2935,8 +2984,6 @@ select {
         margin-top: 20px;
     }
 }
-
-/* ...existing code... */
 
 
 

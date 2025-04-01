@@ -141,35 +141,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция отображения материалов
     function displayMaterials(materials) {
-        materialsList.innerHTML = materials.map(material => {
-            let actionButtons = `
-                <button onclick="deleteMaterial('${material._id}')" class="delete-btn">
-                    <i class="fas fa-trash"></i> Удалить
-                </button>
-            `;
+        const materialsList = document.getElementById('materialsList');
+        materialsList.innerHTML = '';
 
-            if (material.type === 'document' || material.type === 'video') {
-                actionButtons = `
-                    <a href="/api/materials/${material._id}/download" class="download-btn">
-                        <i class="fas fa-download"></i> Скачать
-                    </a>
-                    ${actionButtons}
-                `;
+        materials.forEach(material => {
+            const card = document.createElement('div');
+            card.className = 'material-card';
+            card.setAttribute('data-material-id', material._id); // Изменено с material.id на material._id
+
+            // Определяем иконку в зависимости от типа материала
+            let typeIcon = 'fas fa-file-alt';
+            if (material.type === 'video') {
+                typeIcon = 'fas fa-film';
+            } else if (material.type === 'document') {
+                typeIcon = 'fas fa-file-pdf';
             }
 
-            return `
-                <div class="material-card" data-material-id="${material._id}">
-                    <h4>${material.title}</h4>
-                    ${material.type === 'text' ? 
-                        `<div class="text-preview">${material.content.substring(0, 200)}...</div>` :
-                        `<p>${material.description || ''}</p>`
-                    }
-                    <div class="material-actions">
-                        ${actionButtons}
-                    </div>
+            card.innerHTML = `
+                <div class="material-header">
+                    <i class="${typeIcon}"></i>
+                    <h3 class="material-title">${material.title}</h3>
+                </div>
+                <p class="material-description">${material.description || ''}</p>
+                <div class="material-info">
+                    <span class="material-type">
+                        <i class="fas fa-tag"></i>
+                        ${material.type}
+                    </span>
+                </div>
+                <button class="expand-btn">Показать больше</button>
+                <div class="material-actions">
+                    <button class="download-btn" onclick="window.location.href='/api/materials/download/${material._id}'">
+                        <i class="fas fa-download"></i>
+                        <span>Скачать</span>
+                    </button>
+                    <button class="delete-btn" onclick="deleteMaterial('${material._id}')">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Удалить</span>
+                    </button>
                 </div>
             `;
-        }).join('');
+
+            // Добавляем обработчик для кнопки "Показать больше"
+            const expandBtn = card.querySelector('.expand-btn');
+            expandBtn.addEventListener('click', () => {
+                card.classList.toggle('expanded');
+                expandBtn.textContent = card.classList.contains('expanded') ? 'Свернуть' : 'Показать больше';
+            });
+
+            // Показываем кнопку "Показать больше" только если контент обрезается
+            const description = card.querySelector('.material-description');
+            if (description.scrollHeight <= description.clientHeight) {
+                expandBtn.style.display = 'none';
+            }
+
+            materialsList.appendChild(card);
+        });
     }
 
     // Функция удаления материала
@@ -187,27 +214,23 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Ошибка при удалении материала');
+                throw new Error('Ошибка при удалении материала');
             }
 
             const result = await response.json();
             
             if (result.success) {
-                // Remove the material card from the DOM
                 const materialCard = document.querySelector(`[data-material-id="${materialId}"]`);
                 if (materialCard) {
                     materialCard.remove();
                 }
                 alert('Материал успешно удален');
-                // Optionally reload the materials list
-                await loadMaterials();
             } else {
-                throw new Error(result.error || 'Не удалось удалить материал');
+                throw new Error(result.message || 'Не удалось удалить материал');
             }
         } catch (error) {
             console.error('Ошибка:', error);
-            alert(`Ошибка при удалении материала: ${error.message}`);
+            alert(error.message || 'Произошла ошибка при удалении материала');
         }
     }
 

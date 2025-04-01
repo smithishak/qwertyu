@@ -20,6 +20,10 @@
 
     <div class="main-content">
         <div class="sidebar">
+            <div class="user-info">
+                <div class="user-name"></div>
+                <div class="user-role"></div>
+            </div>
             <ul>
                 <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
                 <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
@@ -103,6 +107,32 @@
                         </div>
                         <div id="testsList" class="tests-list">
                             <!-- Сюда будут добавляться тесты -->
+                            <div class="test-card">
+                                <div class="test-content">
+                                    <h3 class="test-title">${test.title}</h3>
+                                    <p class="test-description">${test.description || ''}</p>
+                                    <div class="test-info">
+                                        <span>
+                                            <i class="fas fa-question-circle"></i>
+                                            ${test.questions ? test.questions.length : 0} вопросов
+                                        </span>
+                                        <span>
+                                            <i class="fas fa-calendar-alt"></i>
+                                            Создан: ${new Date(test.createdAt).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="test-actions">
+                                    <button class="edit-btn" onclick="editTest('${test._id}')">
+                                        <i class="fas fa-edit"></i>
+                                        Редактировать
+                                    </button>
+                                    <button class="delete-btn" onclick="deleteTest('${test._id}')">
+                                        <i class="fas fa-trash"></i>
+                                        Удалить
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -159,6 +189,7 @@
             </form>
         </div>
     </div>
+    <script src="/scripts/user-info.js"></script>
     <script src="../scripts/menu.js"></script>
     <script src="../scripts/admin-tests.js"></script>
     <script src="../scripts/admin-questions.js"></script>

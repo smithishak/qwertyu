@@ -1,53 +1,55 @@
-document.addEventListener('DOMContentLoaded', async function() {
-    const testsList = document.getElementById('testsList');
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        // Получаем тесты
+        const testsResponse = await fetch('/api/tests');
+        const tests = await testsResponse.json();
 
-    function escapeHtml(unsafe) {
-        if (!unsafe) return '';
-        return String(unsafe)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+        // Получаем результаты тестов пользователя
+        const resultsResponse = await fetch('/api/user-test-results');
+        const userResults = await resultsResponse.json();
 
-    async function loadTests() {
-        try {
-            const response = await fetch('/api/tests');
-            const tests = await response.json();
-            
-            if (!Array.isArray(tests)) {
-                testsList.innerHTML = '<div class="no-tests">Нет доступных тестов</div>';
-                return;
-            }
+        const testsList = document.getElementById('testsList');
+        testsList.innerHTML = tests.map(test => {
+            const result = userResults[test._id] || {};
+            const resultHtml = result.completed 
+                ? `<div class="test-result">
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${result.score}%"></div>
+                    </div>
+                    <span class="score-text">Результат: ${result.score}%</span>
+                    <span class="completion-date">Завершён: ${new Date(result.completedAt).toLocaleDateString()}</span>
+                   </div>`
+                : '';
 
-            testsList.innerHTML = tests.map(test => `
-                <div class="test-card" data-test-id="${test._id}">
-                    <h3 class="test-title">${escapeHtml(test.title)}</h3>
-                    <p class="test-description">${escapeHtml(test.description || '')}</p>
+            return `
+                <div class="test-card">
+                    <h3 class="test-title">${test.title}</h3>
+                    <p class="test-description">${test.description || ''}</p>
                     <div class="test-meta">
-                        <span><i class="fas fa-question-circle"></i> Вопросов: ${test.questions?.length || 0}</span>
+                        <span><i class="fas fa-question-circle"></i> ${test.questions.length} вопросов</span>
                         <span class="test-date">
                             <i class="fas fa-calendar-alt"></i> 
                             Создан: ${new Date(test.createdAt).toLocaleDateString()}
                         </span>
                     </div>
-                    <button class="start-test-btn" onclick="startTest('${test._id}')">
-                        <i class="fas fa-play"></i> Начать тест
+                    ${resultHtml}
+                    <button class="start-test-btn" data-test-id="${test._id}">
+                        <i class="fas fa-play"></i>
+                        ${result.completed ? 'Пройти заново' : 'Начать тест'}
                     </button>
                 </div>
-            `).join('');
-        } catch (error) {
-            console.error('Ошибка при загрузке тестов:', error);
-            testsList.innerHTML = '<div class="error-message">Ошибка при загрузке тестов</div>';
-        }
-    }
+            `;
+        }).join('');
 
-    // Функция для начала теста
-    window.startTest = function(testId) {
-        window.location.href = `/pages/take-test.html?id=${testId}`;
+        // Добавляем обработчики для кнопок
+        const startButtons = document.querySelectorAll('.start-test-btn');
+        startButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const testId = button.getAttribute('data-test-id');
+                window.location.href = `/pages/take-test.html?id=${testId}`; // Исправляем путь к файлу
+            });
+        });
+    } catch (error) {
+        console.error('Ошибка при загрузке тестов:', error);
     }
-
-    // Загружаем только тесты при загрузке главной страницы
-    loadTests();
 });

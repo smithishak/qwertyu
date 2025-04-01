@@ -94,11 +94,26 @@ app.use(checkAuth);
 
 // Обновляем middleware проверки админа
 const checkAdmin = async (req, res, next) => {
-    if (!req.session?.isAdmin) {
-        return res.status(403).json({ error: 'Access denied' });
+    console.log('Checking admin status:', {
+        session: req.session,
+        authenticated: req.session?.authenticated,
+        isAdmin: req.session?.isAdmin,
+        userId: req.session?.userId
+    });
+
+    if (!req.session?.authenticated || !req.session?.isAdmin) {
+        return res.status(401).json({ 
+            error: 'Unauthorized',
+            message: 'Admin privileges required',
+            requiresAuth: true
+        });
     }
     next();
 };
+
+// Apply checkAdmin to all admin routes
+app.use('/api/admin/*', checkAdmin);
+app.use('/api/results', checkAdmin);
 
 // Маршрут для авторизации
 app.post('/auth', async (req, res) => {
@@ -126,7 +141,10 @@ app.post('/auth', async (req, res) => {
         res.json({ 
             success: true,
             username: user.username,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            middleName: user.middleName
         });
     } catch (error) {
         console.error('Ошибка авторизации:', error);
@@ -661,24 +679,17 @@ app.get('/api/tests/:id', async (req, res) => {
 });
 
 // Маршруты для статистики
-app.get('/api/admin/statistics/users', checkAdmin, async (req, res) => {
+app.get('/api/admin/statistics/users', async (req, res) => {
     try {
-        // Получаем общее количество пользователей
         const totalUsers = await User.countDocuments();
-
-        // Получаем количество активных пользователей за последние 24 часа
         const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
         const activeUsers = await User.countDocuments({
             lastLoginDate: { $gte: oneDayAgo }
         });
-
-        res.json({
-            totalUsers,
-            activeUsers
-        });
+        res.json({ totalUsers, activeUsers });
     } catch (error) {
-        console.error('Ошибка при получении статистики пользователей:', error);
-        res.status(500).json({ error: 'Ошибка сервера' });
+        console.error('Error getting user statistics:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -1001,13 +1012,17 @@ app.post('/api/test-results', async (req, res) => {
     try {
         const { testId, answers } = req.body;
 
-        if (!testId || !answers || typeof answers !== 'object') {
+        if (!testId || !answers || typeof answers !== 'object' || !req.session?.userId) {
             return res.status(400).json({ error: 'Некорректные данные' });
         }
 
+        // Convert IDs to ObjectId before saving
+        const testObjId = new ObjectId(testId);
+        const userObjId = new ObjectId(req.session.userId);
+
         // Get test questions
         const test = await testsCollection.findOne({
-            _id: new ObjectId(testId)
+            _id: testObjId
         });
 
         if (!test) {
@@ -1029,9 +1044,10 @@ app.post('/api/test-results', async (req, res) => {
             }
         });
 
-        // Save test result
+        // Save test result with proper ObjectIds
         const result = await db.collection('test_results').insertOne({
-            testId: new ObjectId(testId),
+            userId: userObjId,
+            testId: testObjId,
             answers,
             correctAnswers,
             totalQuestions,
@@ -1049,6 +1065,112 @@ app.post('/api/test-results', async (req, res) => {
     } catch (error) {
         console.error('Error submitting test results:', error);
         res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+});
+
+// Update the test results endpoint path
+app.get('/api/admin/test-results', checkAdmin, async (req, res) => {
+    try {
+        console.log('Fetching test results...');
+        
+        // First get raw results to check data
+        const rawResults = await db.collection('test_results').find({}).toArray();
+        console.log('Raw test results:', rawResults);
+
+        const results = await db.collection('test_results')
+            .aggregate([
+                {
+                    $lookup: {
+                        from: 'users',
+                        let: { userId: '$userId' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $eq: ['$_id', { $toObjectId: '$$userId' }] }
+                                }
+                            }
+                        ],
+                        as: 'user'
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'tests',
+                        let: { testId: '$testId' },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: { $eq: ['$_id', { $toObjectId: '$$testId' }] }
+                                }
+                            }
+                        ],
+                        as: 'test'
+                    }
+                },
+                {
+                    $match: {
+                        'test.0': { $exists: true },
+                        'user.0': { $exists: true }
+                    }
+                },
+                {
+                    $project: {
+                        user: { $arrayElemAt: ['$user', 0] },
+                        test: { $arrayElemAt: ['$test', 0] },
+                        score: {
+                            $multiply: [
+                                { $divide: ['$correctAnswers', { $max: ['$totalQuestions', 1] }] },
+                                100
+                            ]
+                        },
+                        completedAt: 1,
+                        correctAnswers: 1,
+                        totalQuestions: 1
+                    }
+                },
+                { $sort: { completedAt: -1 } }
+            ]).toArray();
+
+        // Add detailed logging
+        console.log('Aggregation results:', JSON.stringify(results, null, 2));
+        
+        if (!results.length) {
+            console.log('No results found after aggregation');
+        }
+
+        res.json(results);
+    } catch (error) {
+        console.error('Error fetching test results:', error);
+        res.status(500).json({ 
+            error: 'Internal server error', 
+            details: error.message,
+            stack: error.stack
+        });
+    }
+});
+
+// Добавляем новый endpoint для получения результатов тестов пользователя
+app.get('/api/user-test-results', async (req, res) => {
+    try {
+        const userId = new ObjectId(req.session.userId);
+        const results = await db.collection('test_results')
+            .find({ userId })
+            .toArray();
+        
+        // Преобразуем результаты в удобный формат
+        const resultsByTest = results.reduce((acc, result) => {
+            acc[result.testId] = {
+                completed: result.completed,
+                score: Math.round((result.correctAnswers / result.totalQuestions) * 100),
+                completedAt: result.completedAt
+            };
+            return acc;
+        }, {});
+
+        res.json(resultsByTest);
+    } catch (error) {
+        console.error('Error fetching user test results:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -1075,14 +1197,36 @@ app.get('/login.html', (req, res) => {
 // 4. Переносим статический middleware после определения конкретных маршрутов
 app.use(express.static(path.join(__dirname)));
 
-// 5. Защищаем все остальные HTML файлы
+// 5. Защищаем HTML файлы
 app.get('*.html', (req, res, next) => {
-    if (req.path === 'pages/login.html') {
+    // Страницы, доступные только админам
+    const adminPages = [
+        'admin-panel.html',
+        'views/users-management.html',
+        'views/questions-management.html',
+        'views/theory-management.html'
+    ];
+
+    const requestPath = req.path.replace(/^\//, ''); // Убираем начальный слэш
+
+    // Страница логина доступна всем
+    if (requestPath === 'pages/login.html' || requestPath === 'login.html') {
         return next();
     }
-    checkAdmin(req, res, () => {
-        res.sendFile(path.join(__dirname, req.path));
-    });
+
+    // Проверяем, является ли страница админской
+    if (adminPages.includes(requestPath)) {
+        return checkAdmin(req, res, () => {
+            res.sendFile(path.join(__dirname, req.path));
+        });
+    }
+
+    // Остальные страницы доступны авторизованным пользователям
+    if (req.session?.authenticated) {
+        return res.sendFile(path.join(__dirname, req.path));
+    }
+
+    res.redirect('/login.html');
 });
 
 // Запуск сервера

@@ -20,6 +20,10 @@
 
     <div class="main-content">
         <div class="sidebar">
+            <div class="user-info">
+                <div class="user-name"></div>
+                <div class="user-role"></div>
+            </div>
             <ul>
                 <li id="side-bar-btn"><a href="/admin-panel.html"><i class="fas fa-home"></i> Главная</a></li>
                 <li id="side-bar-btn"><a href="/views/users-management.html"><i class="fas fa-users"></i> Управление пользователями</a></li>
@@ -78,8 +82,29 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Добавляем секцию с результатами тестов -->
+            <div class="test-results-section">
+                <h3><i class="fas fa-clipboard-list"></i> Результаты тестирования</h3>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Пользователь</th>
+                                <th>Тест</th>
+                                <th>Результат</th>
+                                <th>Дата прохождения</th>
+                            </tr>
+                        </thead>
+                        <tbody id="testResultsList">
+                            <!-- Сюда будут добавляться результаты -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
+    <script src="/scripts/user-info.js"></script>
     <script src="scripts/menu.js"></script>
     <script src="scripts/admin.js"></script>
 </body>

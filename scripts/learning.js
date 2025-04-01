@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h4 class="material-title">${doc.title}</h4>
                 <p class="material-description">${doc.description}</p>
                 <div class="material-actions">
-                    <a href="/api/materials/${doc._id}/download" class="download-btn">
+                    <button onclick="window.location.href='/api/materials/${doc._id}/download'" class="view-btn">
                         <i class="fas fa-download"></i> Скачать
-                    </a>
+                    </button>
                 </div>
             </div>
         `).join('');

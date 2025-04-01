@@ -12,19 +12,58 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     };
 
+    // Функция для отображения ошибки
+    const showError = (message) => {
+        alert(message);
+    };
+
+    // Функция авторизации
+    async function login(login, password) {
+        try {
+            const response = await fetch('/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ login, password }),
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Сохраняем данные пользователя с полным ФИО
+                localStorage.setItem('userInfo', JSON.stringify({
+                    firstName: data.firstName || '',
+                    lastName: data.lastName || '',
+                    middleName: data.middleName || '',
+                    isAdmin: data.isAdmin || false,
+                    username: data.username
+                }));
+                
+                // Редирект на главную или админ панель
+                window.location.href = data.isAdmin ? '/admin-panel.html' : '/index.html';
+            } else {
+                showError(data.message || 'Ошибка авторизации');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            showError('Ошибка сервера');
+        }
+    }
+
     // Обработчик отправки формы
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault(); // Предотвращаем стандартную отправку формы
         
         // Получаем данные из формы
-        const login = loginForm.querySelector('input[name="username"]').value;
-        const password = loginForm.querySelector('input[name="password"]').value;
+        const loginValue = loginForm.querySelector('input[name="username"]').value;
+        const passwordValue = loginForm.querySelector('input[name="password"]').value;
 
         // Добавим отладочный вывод
-        console.log('Попытка входа:', { login, password });
+        console.log('Попытка входа:', { login: loginValue, password: passwordValue });
 
         // Проверяем валидацию
-        const error = validateForm(login, password);
+        const error = validateForm(loginValue, passwordValue);
         if (error) {
             alert(error);
             return;
@@ -35,47 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         submitButton.textContent = 'Выполняется вход...';
 
         try {
-            // Отправляем запрос на сервер
-            const response = await fetch('/auth', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify({ login, password })
-            });
-
-            const data = await response.json();
-            
-            // Расширенное логирование
-            console.group('Детальная отладка авторизации');
-            console.log('Исходные данные входа:', { login, password });
-            console.log('Статус ответа:', response.status);
-            console.log('Заголовки ответа:', Object.fromEntries(response.headers.entries()));
-            console.log('Тело ответа:', data);
-            console.log('isAdmin:', data.isAdmin);
-            console.log('Тип isAdmin:', typeof data.isAdmin);
-            console.groupEnd();
-            
-            // Обрабатываем ответ
-            if (data.success) {
-                // Сохраняем информацию о пользователе
-                localStorage.setItem('isAdmin', data.isAdmin);
-                
-                if (data.isAdmin === true) {
-                    console.log('Пользователь админ, редирект на админ-панель');
-                    window.location.href = '/admin-panel.html';
-                } else {
-                    console.log('Обычный пользователь, редирект на главную');
-                    window.location.href = '/index.html';
-                }
-            } else {
-                // При ошибке показываем сообщение
-                alert('Неверный логин или пароль');
-            }
-        } catch (error) {
-            console.error('Ошибка авторизации:', error);
-            alert('Произошла ошибка при авторизации. Пожалуйста, попробуйте позже.');
+            await login(loginValue, passwordValue);
         } finally {
             // Возвращаем кнопку в исходное состояние
             submitButton.disabled = false;
