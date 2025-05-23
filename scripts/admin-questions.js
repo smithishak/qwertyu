@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const addQuestionForm = document.getElementById('addQuestionForm');
     const addAnswerBtn = document.getElementById('addAnswerBtn');
     const answersContainer = document.getElementById('answersContainer');
-    let answerCount = 1;
+    let answerCount = 0;
 
     // Добавление нового варианта ответа
     if (addAnswerBtn && answersContainer) {
