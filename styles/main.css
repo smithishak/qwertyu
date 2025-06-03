@@ -39,11 +39,19 @@ header {
     background-color: var(--primary-color);
     color: white;
     padding: 20px;
-    text-align: center;
     font-size: 24px;
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    position: relative;  /* Для абсолютного позиционирования дочерних элементов */
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+}
+
+.header-logo {
+    height: 40px;
+    vertical-align: middle;
 }
 
 .main-content {
@@ -106,10 +114,6 @@ header {
 
 .menu-btn {
     display: none;
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
     cursor: pointer;
     font-size: 24px;
 }
@@ -239,6 +243,7 @@ header {
 }
 
 .logo {
+    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
